@@ -1,0 +1,13 @@
+node_modules/
+src/vendor/
+src/data/
+src/style/*.css
+lang/*.mo
+web/
+temp/
+ENV/
+doc/
+dist/
+test/
+.idea/workspace.xml
+.idea/tasks.xml

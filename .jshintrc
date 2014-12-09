@@ -1,0 +1,26 @@
+{
+    "globals": {
+    	"Event": true
+    	,"NodeList": true
+	},
+    "strict": true,
+    "browser": true,
+    "jquery": true,
+    "devel": true,
+    "plusplus": false,
+    "white": false,
+    "nomen": false,
+    "noarg": true,
+    "nonew": true,
+    "undef": true,
+    "unused": "vars",
+    "trailing": true,
+    "laxcomma": true,
+    "loopfunc": true,
+    "scripturl": true,
+    "smarttabs": true,
+    "boss": true,
+    "expr": true,
+    "noempty": false,
+    "laxbreak": true
+}
