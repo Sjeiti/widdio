@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.2
+ * @version 2.0.3
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -52,8 +52,6 @@ var widdio = (function(document,window,undefined) {
 		//
 		,aWiddioObj = []
 		//
-		,iMaxZ = Math.pow(2,32)/2-1
-		//
 		// browser/device detection
 		,bWebkit = false//$.browser.webkit
 		//,bIOs = !!navigator.userAgent.match(/iPod|iPhone|iPad/i)
@@ -62,6 +60,8 @@ var widdio = (function(document,window,undefined) {
 		,fnFullscreen
 		//
 		,sClassnameHide = 'fadeOut'
+		//
+		,sCSS = '.widdio{position:relative;z-index:auto;color:white}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483647}.widdio.nobars .staticwrap{width:100%;height:100%;overflow:hidden}.widdio.fullscreen video{width:100%;height:100%}.widdio .staticwrap{height:100%}.widdio video{display:block}.widdio .controls{height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4)}.widdio .controls.over{position:absolute;bottom:0}.widdio .controls>*{position:relative;height:100%;overflow:hidden;display:block;float:left;cursor:pointer;text-align:center}.widdio.fullscreen .controls{position:fixed;bottom:0}.widdio .icon.center.play,.widdio .controls{visibility:visible;opacity:1;transition:opacity 200ms linear;-webkit-transition:opacity 200ms linear}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}.widdio .overlay{position:absolute;left:0;top:0;width:100%;height:100%}.widdio .icon{background-image:url(data:image/png;base64,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);backround-repeat:no-repeat;height:30px;width:30px}.widdio .icon.play.center{background-position:-180px 0}.widdio .icon.pause.center{background-position:-300px 0}.widdio .icon.play{background-position:0px 0px}.widdio .icon.pause{background-position:-30px 0}.widdio .icon.stop{background-position:-60px 0}.widdio .icon.mute{background-position:-90px 0}.widdio .icon.muted{background-position:-120px 0}.widdio .icon.fullscreen{background-position:-150px 0}.widdio .icon.center.play:hover{background-position:-240px 0}.widdio .icon.center.pause:hover{background-position:-360px 0}.widdio .icon.play:hover{background-position:0 -30px}.widdio .icon.pause:hover{background-position:-30px -30px}.widdio .icon.stop:hover{background-position:-60px -30px}.widdio .icon.mute:hover{background-position:-90px -30px}.widdio .icon.muted:hover{background-position:-120px -30px}.widdio .icon.fullscreen:hover{background-position:-150px -30px}.widdio .icon.center{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px}.widdio .bar{position:relative;width:1px;margin-top:10px;height:10px;background-color:#FFF}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{font-weight:bold;font-size:12px;line-height:30px}'
 		//
 		,oReturn = {
 			// exposed functions
@@ -164,6 +164,19 @@ var widdio = (function(document,window,undefined) {
 				}
 			};
 		}
+		// overload classList.add
+		(function(m){
+			if (m.classList) {
+				m.classList.add('a','b');
+				if (!m.classList.contains('b')) {
+					var tokenProto = DOMTokenList.prototype
+						,fnAdd = tokenProto.add
+						,fnRem = tokenProto.remove;
+					tokenProto.add =	function(){ for (var i=0,l=arguments.length;i<l;i++) fnAdd.call(this,arguments[i]); };
+					tokenProto.remove =	function(){ for (var i=0,l=arguments.length;i<l;i++) fnRem.call(this,arguments[i]); };
+				}
+			}
+		})(document.createElement('div'));
 	}
 
 	/**
@@ -197,14 +210,9 @@ var widdio = (function(document,window,undefined) {
 	 * @param {object} options
 	 */
 	function initVideo(video,options){
-		var fnConstructor = video.constructor;
-		if (fnConstructor===NodeList) {
-			for (var i=0,l=video.length;i<l;i++) {
-				instance(video[i],options);
-
-			}
-		} else if (fnConstructor===HTMLVideoElement) {
-			instance(video,options);
+		if (video.constructor===HTMLVideoElement) video = [video];
+		for (var i=0,l=video.length;i<l;i++) {
+			aWiddioObj.push(instance(video[i],options));
 		}
 	}
 
@@ -232,21 +240,28 @@ var widdio = (function(document,window,undefined) {
 
 	/**
 	 * Tests if document is fullscreen
-	 * @returns {*}
+	 * @returns {boolean}
 	 */
 	function isFullscreen(){
 		return document.isFullScreen||document.mozFullScreen||document.webkitIsFullScreen;
 	}
-	//
-	// playOne
+
+	/**
+	 * Play a video, pause all others.
+	 * @param {HTMLVideoElement} video
+	 */
 	function playOne(video){
 		for (var i=0,l=aWiddioObj.length;i<l;i++) {
 			var oVideo = aWiddioObj[i];
 			if (oVideo.video!==video) oVideo.pause();
 		}
 	}
-	//
-	// getVideo
+
+	/**
+	 * Get the widdio API for a video..
+	 * @param {HTMLVideoElement} video
+	 * @returns {Object}
+	 */
 	function getWiddio(video){
 		var oReturn;
 		if (video.constructor!==HTMLVideoElement) video = video.querySelector('video');
@@ -271,17 +286,17 @@ var widdio = (function(document,window,undefined) {
 	 * @returns {widdio}
 	 */
 	function instance(video,_settings) {
-		//
-		// private variables
-		var oSettings = extend(extend({},_settings),oDefault.defaults)
+		var pause = togglePlay.bind(undefined,false)
 			//
-			,iVidW		// video width
-			,iVidH		// video height
-			,fVidAspR	// video aspect ratio
+			,oSettings = extend(extend({},_settings),oDefault.defaults)
 			//
-			,iWidW		// widdio width
-			,iWidH		// widdio height (excludes the controls bar)
-			,fWidAspR	// widdio aspect ratio
+			,iVidW
+			,iVidH
+			,fVidAspR
+			//
+			,iWidW
+			,iWidH // excluding controls bar
+			,fWidAspR
 			//
 			,mVideo = video
 			,mParent = mVideo.parentNode
@@ -299,28 +314,31 @@ var widdio = (function(document,window,undefined) {
 			,mControlsBuffer
 			,mCnTime
 			,mCenter
+			,mWiddioGhost
 			//
 			,sVideoID = mVideo.getAttribute('id')
 			//
 			,axSources
-			//var oMimes = {
-			//	ogg:	"ogv"
-			//};
-			//
 			//
 			,sOriginalSize
-			,mWiddioGhost
 			//
 			,iCenterFadeID = 0
 			,iControlsFadeID = 0
 			,iCenterFadeTime = 1500
 			//
-			,iControlsHeight;
-		//
-		// PRIVATE FUNCTIONS
-		//
-		// init (self invoking)
+			,iControlsHeight
+			//
+			,sState = oReturn.STATE_START
+		;
+
 		(function init() {
+			initInstVariables();
+			initInstAPI();
+			initInstEvents();
+			initInstView();
+		})();
+
+		function  initInstVariables(){
 			if (!sVideoID) {
 				sVideoID = btoa(Math.random()).replace(/^\d*|[^\w]/g,'');
 				mVideo.setAttribute('id',sVideoID);
@@ -336,20 +354,24 @@ var widdio = (function(document,window,undefined) {
 			//
 			// prepare video
 			axSources = mVideo.querySelectorAll('source');
-			video.controls = false;
+			mVideo.controls = false;
 			//
 			// fix iPad
 			if (bIPad) {
 				Array.prototype.forEach.call(axSources,function(source){
-					var bCanPlay = video.canPlayType(source.getAttribute('type'));
+					var bCanPlay = mVideo.canPlayType(source.getAttribute('type'));
 					if (bCanPlay) mVideo.setAttribute('src',source.getAttribute('src'));
 					mVideo.removeChild(source);
 				});
 			}
-			//
-			// video objects
-			mVideo.widdio = {
-				 video:			video
+		}
+
+		/**
+		 * Initialise instance external API
+		 */
+		function  initInstAPI(){
+			extend(mVideo,{widdio:{
+				 video:			mVideo
 				,play: function(file) {
 					if (file===undefined) {
 						togglePlay(true);
@@ -358,37 +380,35 @@ var widdio = (function(document,window,undefined) {
 					}
 				}
 				,stop:			stop
-				,toggle:		function(){togglePlay();}
-				,pause:			function(){togglePlay(false);}
+				,toggle:		togglePlay.bind(undefined,undefined)//function(){togglePlay();}
+				,pause:			pause
 				,sound:			toggleSound
 				,fullscreen:	toggleFullscreen
 				,isPlaying:		isPlaying
 				,getState:		function(){return sState;}
 				,toString:		function(){return '[WiddioInstance #'+sVideoID+']';}
-			};
-			aWiddioObj.push({
-				 video:					video
-				,resize:				resize
-				,setFullscreenView:		setFullscreenView
-				,pause:					function(){togglePlay(false);}
-			});
-			//
-			// add events
+			}});
+		}
+
+		/**
+		 * Initialise instance events
+		 */
+		function  initInstEvents(){
 			[
 				//,'loadstart'		// The user agent begins looking for media data, as part of the resource selection algorithm.	networkState equals NETWORK_LOADING
-				//,'progress'			// The user agent is fetching media data.	networkState equals NETWORK_LOADING
-				//,'suspend'			// The user agent is intentionally not currently fetching media data, but does not have the entire media resource downloaded.	networkState equals NETWORK_IDLE
+				//,'progress'		// The user agent is fetching media data.	networkState equals NETWORK_LOADING
+				//,'suspend'		// The user agent is intentionally not currently fetching media data, but does not have the entire media resource downloaded.	networkState equals NETWORK_IDLE
 				//,'abort'			// The user agent stops fetching the media data before it is completely downloaded, but not due to an error.	error is an object with the code MEDIA_ERR_ABORTED. networkState equals either NETWORK_EMPTY or NETWORK_IDLE, depending on when the download was aborted.
-				'error'			// An error occurs while fetching the media data.	error is an object with the code MEDIA_ERR_NETWORK or higher. networkState equals either NETWORK_EMPTY or NETWORK_IDLE, depending on when the download was aborted.
-				//,'emptied'			// A media element whose networkState was previously not in the NETWORK_EMPTY state has just switched to that state (either because of a fatal error during load that's about to be reported, or because the load() method was invoked while the resource selection algorithm was already running).	networkState is NETWORK_EMPTY; all the IDL attributes are in their initial states.
-				//,'stalled'			// The user agent is trying to fetch media data, but data is unexpectedly not forthcoming.	networkState is NETWORK_LOADING.
+				'error'				// An error occurs while fetching the media data.	error is an object with the code MEDIA_ERR_NETWORK or higher. networkState equals either NETWORK_EMPTY or NETWORK_IDLE, depending on when the download was aborted.
+				//,'emptied'		// A media element whose networkState was previously not in the NETWORK_EMPTY state has just switched to that state (either because of a fatal error during load that's about to be reported, or because the load() method was invoked while the resource selection algorithm was already running).	networkState is NETWORK_EMPTY; all the IDL attributes are in their initial states.
+				//,'stalled'		// The user agent is trying to fetch media data, but data is unexpectedly not forthcoming.	networkState is NETWORK_LOADING.
 				,'loadedmetadata'	// Event	The user agent has just determined the duration and dimensions of the media resource and the text tracks are ready.	readyState is newly equal to HAVE_METADATA or greater for the first time.
 				//,'loadeddata'		// The user agent can render the media data at the current playback position for the first time.	readyState newly increased to HAVE_CURRENT_DATA or greater for the first time.
-				//,'canplay'			// The user agent can resume playback of the media data, but estimates that if playback were to be started now, the media resource could not be rendered at the current playback rate up to its end without having to stop for further buffering of content.	readyState newly increased to HAVE_FUTURE_DATA or greater.
+				,'canplay'			// The user agent can resume playback of the media data, but estimates that if playback were to be started now, the media resource could not be rendered at the current playback rate up to its end without having to stop for further buffering of content.	readyState newly increased to HAVE_FUTURE_DATA or greater.
 				//,'canplaythrough'	// The user agent estimates that if playback were to be started now, the media resource could be rendered at the current playback rate all the way to its end without having to stop for further buffering.	readyState is newly equal to HAVE_ENOUGH_DATA.
-				//,'playing'			// Playback is ready to start after having been paused or delayed due to lack of media data.	readyState is newly equal to or greater than HAVE_FUTURE_DATA and paused is false, or paused is newly false and readyState is equal to or greater than HAVE_FUTURE_DATA. Even if this event fires, the element might still not be potentially playing, e.g. if the element is blocked on its media controller (e.g. because the current media controller is paused, or another slaved media element is stalled somehow, or because the media resource has no data corresponding to the media controller position), or the element is paused for user interaction.
-				//,'waiting'			// Playback has stopped because the next frame is not available, but the user agent expects that frame to become available in due course.	readyState is equal to or less than HAVE_CURRENT_DATA, and paused is false. Either seeking is true, or the current playback position is not contained in any of the ranges in buffered. It is possible for playback to stop for other reasons without paused being false, but those reasons do not fire this event (and when those situations resolve, a separate playing event is not fired either): e.g. the element is newly blocked on its media controller, or playback ended, or playback stopped due to errors, or the element has paused for user interaction.
-				//,'seeking'			// The seeking IDL attribute changed to true and the seek operation is taking long enough that the user agent has time to fire the event.
+				//,'playing'		// Playback is ready to start after having been paused or delayed due to lack of media data.	readyState is newly equal to or greater than HAVE_FUTURE_DATA and paused is false, or paused is newly false and readyState is equal to or greater than HAVE_FUTURE_DATA. Even if this event fires, the element might still not be potentially playing, e.g. if the element is blocked on its media controller (e.g. because the current media controller is paused, or another slaved media element is stalled somehow, or because the media resource has no data corresponding to the media controller position), or the element is paused for user interaction.
+				//,'waiting'		// Playback has stopped because the next frame is not available, but the user agent expects that frame to become available in due course.	readyState is equal to or less than HAVE_CURRENT_DATA, and paused is false. Either seeking is true, or the current playback position is not contained in any of the ranges in buffered. It is possible for playback to stop for other reasons without paused being false, but those reasons do not fire this event (and when those situations resolve, a separate playing event is not fired either): e.g. the element is newly blocked on its media controller, or playback ended, or playback stopped due to errors, or the element has paused for user interaction.
+				//,'seeking'		// The seeking IDL attribute changed to true and the seek operation is taking long enough that the user agent has time to fire the event.
 				//,'seeked'			// The seeking IDL attribute changed to false.
 				,'ended'			// Playback has stopped because the end of the media resource was reached.	currentTime equals the end of the media resource; ended is true.
 				//,'durationchange'	// The duration attribute has just been updated.
@@ -398,19 +418,24 @@ var widdio = (function(document,window,undefined) {
 				//,'ratechange'		// Either the defaultPlaybackRate or the playbackRate attribute has just been updated.
 				,'volumechange'		// Either the volume attribute or the muted attribute has changed. Fired after the relevant attribute's setter has returned.
 			].forEach(function(event){
-				video.addEventListener(event,handleMediaEvent);
+				mVideo.addEventListener(event,handleMediaEvent);
 			});
 			//
 			mVideo.addEventListener('click',togglePlay);
-			//
+		}
+
+		/**
+		 * Initialise instance view
+		 */
+		function  initInstView(){
 			addCss();
 			addControls();
-			//
-			//
 			resize();
-		})();
+		}
 
-
+		/**
+		 * Wrap the video element and add controls
+		 */
 		function addControls(){
 			var sVideoClass = mVideo.getAttribute('class')
 				,aVideoClass = sVideoClass?sVideoClass.split(' '):[];
@@ -418,6 +443,7 @@ var widdio = (function(document,window,undefined) {
 			mWiddio = createDiv(aVideoClass,undefined,{id:oDefault.id.toLowerCase()+'_'+sVideoID});
 			mStaticWrap = createDiv('staticwrap',mWiddio);
 			mWrap = createDiv('wrap',mStaticWrap);
+			console.log('controls',['controls',oSettings.controlsPosition]); // log
 			mControls = createDiv(['controls',oSettings.controlsPosition],mWiddio);
 			mWiddio.style.width = oSettings.width+'px';
 			mParent.insertBefore(mWiddio,mVideo);
@@ -460,7 +486,7 @@ var widdio = (function(document,window,undefined) {
 				}
 				mWiddio.addEventListener('mouseout',function(){
 					clearTimeout(iCenterFadeID);
-					if (oSettings.controlsFadeWhenPaused||!video.paused) {
+					if (oSettings.controlsFadeWhenPaused||!mVideo.paused) {
 						mCenter&&mCenter.classList.add(sClassnameHide);
 						if (oSettings.controlsPosition===oReturn.CONTROLS_OVER) {
 							clearTimeout(iControlsFadeID);
@@ -472,20 +498,22 @@ var widdio = (function(document,window,undefined) {
 					clearTimeout(iCenterFadeID);
 					mCenter&&mCenter.classList.remove(sClassnameHide);
 					iCenterFadeID = setTimeout(function(){
-						if (!video.paused) mCenter&&mCenter.classList.add(sClassnameHide);
+						if (!mVideo.paused) mCenter&&mCenter.classList.add(sClassnameHide);
 					},iCenterFadeTime);
 					if (oSettings.controlsPosition===oReturn.CONTROLS_OVER) {
 						clearTimeout(iControlsFadeID);
 						mControls.classList.remove(sClassnameHide);
 						iControlsFadeID = setTimeout(function(){
-							if (!video.paused) mControls.classList.add(sClassnameHide);
+							if (!mVideo.paused) mControls.classList.add(sClassnameHide);
 						},iCenterFadeTime);
 					}
 				});
 			}
 		}
 
-		// resize
+		/**
+		 * Resize the widdio instance
+		 */
 		function resize() {
 			switch (oSettings.size) {
 				case oReturn.SIZE_ORIGINAL:
@@ -518,7 +546,10 @@ var widdio = (function(document,window,undefined) {
 			resizeControls();
 			resizeScrub();
 		}
-		// resizeVideo
+
+		/**
+		 * Resize the instance video
+		 */
 		function resizeVideo() {//todo:iWidW
 			var sL = 'auto';//todo:iWidW
 			var sT = 'auto';//todo:iWidW
@@ -526,7 +557,7 @@ var widdio = (function(document,window,undefined) {
 			var sH = '100%';//todo:iWidW
 			mWiddio.style.width = iWidW+'px';
 			mWiddio.style.height = iWidH+'px';
-//				var bNoBars = oSettings.scaleMode===ww.SCALE_NOBARS;
+			//var bNoBars = oSettings.scaleMode===ww.SCALE_NOBARS;
 			if (oSettings.scaleMode===oReturn.SCALE_NOBARS&&oSettings.size!==oReturn.SIZE_ORIGINAL) {
 				var bFullscreen = oSettings.size===oReturn.SIZE_FULLSCREEN;
 				var iTmpW = bFullscreen?iScrW:iWidW;
@@ -551,14 +582,21 @@ var widdio = (function(document,window,undefined) {
 			mVideo.style.marginLeft = sL;
 			mVideo.style.marginTop = sT;
 		}
-		// resizeControls
+
+		/**
+		 * Resize the instance controls
+		 */
 		function resizeControls() {
 			mControls.style.width = iWidW+'px';
 			var iOverW = mControls.offsetWidth-iWidW;
 			if (iOverW) mControls.style.width = (iWidW-iOverW)+'px';
 		}
-		// resizeScrub (todo: does not always init with multiple videos)
+
 		//var iReisizeScrub;
+		/**
+		 * Resize the instance scrub control
+		 * @todo does not always init with multiple videos
+		 */
 		function resizeScrub() {
 			if (mCnScrub) {
 				//clearTimeout(iReisizeScrub);
@@ -575,9 +613,11 @@ var widdio = (function(document,window,undefined) {
 			}
 		}
 
-		// toggleFullscreen
+		/**
+		 * Toggle instance fullscreen
+		 */
 		function toggleFullscreen(){
-			console.log('toggleFullscreen',!!fnFullscreen,bWebkit); // log
+			//console.log('toggleFullscreen',!!fnFullscreen,bWebkit); // log
 			// browser fullscreen (with user interface)
 			if (fnFullscreen||bWebkit) {
 				if (fnFullscreen) {
@@ -600,21 +640,23 @@ var widdio = (function(document,window,undefined) {
 				}
 
 			// webkit video fullscreen (reverts to native webkit user interface)
-			} else if (bWebkit&&video.webkitSupportsFullscreen) { // &&!oVideo.webkitDisplayingFullscreen
-				video.webkitEnterFullscreen();
-
+			} else if (bWebkit&&mVideo.webkitSupportsFullscreen) { // &&!oVideo.webkitDisplayingFullscreen
+				mVideo.webkitEnterFullscreen();
 			} else {
 				setFullscreenView();
-
 			}
 		}
-		// setFullscreenView
-		function setFullscreenView(toFull){
-			if (toFull===undefined) toFull = oSettings.size!==oReturn.SIZE_FULLSCREEN;
+
+		/**
+		 * Change to- or from fullscreen
+		 * @param {boolean} toFullscreen
+		 */
+		function setFullscreenView(toFullscreen){
+			if (toFullscreen===undefined) toFullscreen = oSettings.size!==oReturn.SIZE_FULLSCREEN;
 			//
-			var bPlaying = !video.paused;
+			var bPlaying = !mVideo.paused;
 			mWiddio.classList.remove(oSettings.size);
-			if (toFull) {
+			if (toFullscreen) {
 				sOriginalSize = oSettings.size; // store size when going fullscreen
 				oSettings.size = oReturn.SIZE_FULLSCREEN;
 				if (!fnFullscreen) {
@@ -632,42 +674,55 @@ var widdio = (function(document,window,undefined) {
 			}
 			mWiddio.classList.add(oSettings.size);
 			resize();
-			!fnFullscreen&&bPlaying&&video.play();
+			!fnFullscreen&&bPlaying&&mVideo.play();
 		}
 
-		//
-		// scrub
+		/**
+		 * Scrub
+		 * @param {Event} e
+		 */
 		function scrub(e) {
 			setPartPlayed((e.pageX-mCnScrub.getBoundingClientRect().left)/mCnScrub.offsetWidth);
 		}
 
-		// setPartPlayed
+		/**
+		 * Change the video time
+		 * @param {number} f A floating point between 0 and 1
+		 */
 		function setPartPlayed(f) {
-			console.log('setPartPlayed',f,video.duration); // log
-			video.currentTime = f*video.duration;
+			mVideo.currentTime = f*mVideo.duration;
 		}
 
-		// getPartPlayed
+		/**
+		 * Get the video time as a floating point between 0 and 1
+		 * @returns {number}
+		 */
 		function getPartPlayed() {
 			var fPartPlayed = 0;
-			if (video.currentTime&&video.duration) fPartPlayed = video.currentTime/video.duration;
+			if (mVideo.currentTime&&mVideo.duration) fPartPlayed = mVideo.currentTime/mVideo.duration;
 			return fPartPlayed;
 		}
 
-		// isPlaying
+		/**
+		 * Check if the video is playing
+		 * @returns {boolean}
+		 */
 		function isPlaying() {
-			return video.currentTime>0&&!video.paused&&!video.ended;
+			return mVideo.currentTime>0&&!mVideo.paused&&!mVideo.ended;
 		}
 
-		// playVideo
+		/**
+		 * Play a video
+		 * @param {String} file
+		 */
 		function playVideo(file) {
-			if (!video.paused&&oSettings.fadeVolumeTime>0) {
+			if (!mVideo.paused&&oSettings.fadeVolumeTime>0) {
 				fadeOutBeforeLoad(file);
 				return;
 			}
 			switch (typeof(file)) {
 				case "string":
-					video.src = file;
+					mVideo.src = file;
 				break;
 				case "object": // removes all sources and inserts the new ones from the object
 					Array.prototype.forEach.call(axSources,function(source){
@@ -676,9 +731,9 @@ var widdio = (function(document,window,undefined) {
 					var bFound = false;
 					file.forEach(function(src,type){
 						if (!bFound) {
-							var sCanPlay = video.canPlayType("video/"+type);
+							var sCanPlay = mVideo.canPlayType("video/"+type);
 							if (sCanPlay=="maybe"||sCanPlay=="probably") {
-								video.src = src;
+								mVideo.src = src;
 								bFound = true;
 							}
 						}
@@ -686,91 +741,113 @@ var widdio = (function(document,window,undefined) {
 					axSources = mVideo.querySelectorAll('source');
 				break;
 			}
-			video.load();
-			video.play();
-			if (video.muted) { // hack for oVideo not remembering the sound state correctly after load
+			mVideo.load();
+			mVideo.play();
+			if (mVideo.muted) { // hack for oVideo not remembering the sound state correctly after load
 				toggleSound(true);
 				toggleSound(false);
 			}
 			showPlayPause();
 		}
 
-		// stop
+		/**
+		 * Stops the video playback
+		 */
 		function stop() {
-			togglePlay(false);
-			video.currentTime = 0;
+			pause();
+			mVideo.currentTime = 0;
 		}
 
-		// togglePlay
-		function togglePlay(e) {
-			var bT = e===true;
-			var bF = e===false;
-			var bE = bT||bF;
-			if ((!bE&&video.paused)||(bE&&bT)) {
-				video.play();
-			} else if ((!bE&&!video.paused)||(bE&&bF)) {
-				video.pause();
+		/**
+		 * Toggles the video playback
+		 * @param {boolean} [play] Optionally force playback
+		 */
+		function togglePlay(play) {
+			var bForcePlay = play===true
+				,bForcePause = play===false
+				,bForce = bForcePlay||bForcePause;
+			if ((!bForce&&mVideo.paused)||(bForce&&bForcePlay)) {
+				mVideo.play();
+			} else if ((!bForce&&!mVideo.paused)||(bForce&&bForcePause)) {
+				mVideo.pause();
 			}
 		}
 
-		// showPlayPause
+		/**
+		 * Changes view depending on video playback
+		 */
 		function showPlayPause() {
 			[mCenter,mCnPlayPause].forEach(function(elm){
 				if (elm) {
-					elm.classList.remove(!video.paused?'play':'pause');
-					elm.classList.add(video.paused?'play':'pause');
+					elm.classList.remove(!mVideo.paused?'play':'pause');
+					elm.classList.add(mVideo.paused?'play':'pause');
 				}
 			});
 		}
 
-		// showTime
+		/**
+		 * Shows elapsed time
+		 */
 		function showTime() {
 			if (mCnTime) {
-				mCnTime.textContent = formatMinutes(video.currentTime||0)+' / '+formatMinutes(video.duration||0);
+				mCnTime.textContent = formatMinutes(mVideo.currentTime||0)+' / '+formatMinutes(mVideo.duration||0);
 			}
 		}
 
-		// formatMinutes
-		function formatMinutes(f) {
-			return strPad(''+parseInt(f/60,10),2,0,true)+':'+strPad(''+parseInt(f,10)%60,2,0,true);
+		/**
+		 * Formats milliseconds to minutes
+		 * @param {number} millis
+		 * @returns {string}
+		 */
+		function formatMinutes(millis) {
+			return strPad(''+parseInt(millis/60,10),2,0,true)+':'+strPad(''+parseInt(millis,10)%60,2,0,true);
 		}
 
-
-		// toggleSound
+		/**
+		 * Toggles the sound
+		 * @param {number|boolean} [e]
+		 */
 		function toggleSound(e) { // volume :: float (0-1), muted :: Boolean, null :: toggle mute
 			// todo: save states in cookie
-			if (typeof(e)==='object'||e===null||e===undefined) e = video.muted;
+			if (typeof(e)==='object'||e===null||e===undefined) e = mVideo.muted;
 			var bT = e===true;
 			var bF = e===false;
 			if (bT||bF) { // mute
-				video.muted = !e;
+				mVideo.muted = !e;
 			} else { // volume
 				toggleSound(true);
-				video.volume = e;
+				mVideo.volume = e;
 			}
 		}
 
-		// showSound
+		/**
+		 * Changes view depending on sound
+		 */
 		function showSound() {
-			mCnMute.classList.remove(!video.muted?'muted':'mute');
-			mCnMute.classList.add(video.muted?'muted':'mute');
+			mCnMute.classList.remove(!mVideo.muted?'muted':'mute');
+			mCnMute.classList.add(mVideo.muted?'muted':'mute');
 		}
 
-		// handleMediaEvent
+		/**
+		 * Handles the media event
+		 * @param {Event} e
+		 */
 		function handleMediaEvent(e) {
-			//console.log('handleMediaEvent',e.type,e); // log
 			switch (e.type) {
 				case 'loadedmetadata':
-					iVidW = video.videoWidth;
-					iVidH = video.videoHeight;
+					iVidW = mVideo.videoWidth;
+					iVidH = mVideo.videoHeight;
 					fVidAspR = iVidW/iVidH;
 					resize();
 					showTime();
 				break;
+				case 'canplay':
+					//console.log('canplay'); // log
+				break;
 				case 'play':
 					showPlayPause();
 					setCssState();
-					if (oReturn.playOne) playOne(video);
+					if (oReturn.playOne) playOne(mVideo);
 				break;
 				case 'pause':
 					showPlayPause();
@@ -782,7 +859,7 @@ var widdio = (function(document,window,undefined) {
 					setCssState();
 				break;
 				case 'ended':
-					video.pause();
+					mVideo.pause();
 					setCssState();
 				break;
 				case 'volumechange':
@@ -800,13 +877,14 @@ var widdio = (function(document,window,undefined) {
 			}
 		}
 
-		// set css state
-		var sState = oReturn.STATE_START;
+		/**
+		 * Sets the CSS state
+		 */
 		function setCssState() {
 			var sOldState = sState;
-			if (video.paused) {
-				if (video.currentTime===0) sState = oReturn.STATE_START;
-				else if (video.currentTime===video.duration) sState = oReturn.STATE_ENDED;
+			if (mVideo.paused) {
+				if (mVideo.currentTime===0) sState = oReturn.STATE_START;
+				else if (mVideo.currentTime===mVideo.duration) sState = oReturn.STATE_ENDED;
 				else sState = oReturn.STATE_PAUSED;
 			} else {
 				sState = oReturn.STATE_PLAYING;
@@ -818,7 +896,11 @@ var widdio = (function(document,window,undefined) {
 			}
 		}
 
-		// fadeOutBeforeLoad
+		/**
+		 * Fades the volume before load?
+		 * @param file
+		 * @todo re-implement
+		 */
 		function fadeOutBeforeLoad(file) {
 			/*$Video.animate(
 				 {opacity:0}
@@ -828,7 +910,7 @@ var widdio = (function(document,window,undefined) {
 						video.volume = 1-o.pos;
 					}
 					,complete: function(){
-						togglePlay(false);
+						pause();
 						playVideo(file);
 						$Video.fadeTo(1,1);
 						video.volume = 1;
@@ -837,7 +919,13 @@ var widdio = (function(document,window,undefined) {
 			);*/
 		}
 
-		return video;
+		// expose instance methods
+		return {
+			 video:				mVideo
+			,resize:			resize
+			,setFullscreenView:	setFullscreenView
+			,pause:				pause
+		};
 	}
 	//################################################################################################################
 	//###############################################################################################################
@@ -883,152 +971,33 @@ var widdio = (function(document,window,undefined) {
 	 * Adds css directly to document.styleSheets
 	 */
 	function addCss(){
-		var oSheet;
-		var sSheet = '';
+		var oSheet
+			,bCannotAdd = false;
 		//var aValidMedia = ['screen','all','handheld'];
 		if (document.styleSheets&&document.styleSheets.length) {
 			oSheet = getSheetByMedia('all')||getSheetByMedia('screen')||document.styleSheets[0];
 		}
+		if (!oSheet) bCannotAdd = true;
 		//document.querySelector('head').appendChild(document.createElement('link'));
 		//$('<link type="text/css" rel="stylesheet" />').prependTo($('head'));
-
 		function addRule(selector,rule){
 			try {
-				if (!oSheet) sSheet = selector+'{'+rule+'}'+"\n"+sSheet;
-				else if (oSheet.insertRule) oSheet.insertRule(selector+'{'+rule+'}', 0);
+				if (oSheet.insertRule) oSheet.insertRule(selector+'{'+rule+'}', 0);
 				else oSheet.addRule(selector,rule);
 			} catch (err) { // todo: code this better
-				sSheet = selector+'{'+rule+'}'+"\n"+sSheet;
+				bCannotAdd = true;
 			}
 		}
-		//
-
-		addRule('.widdio .time',glue([
-			'font-weight:bold;'
-			,'font-size:12px;'
-			,'line-height:30px;']));
-
-		addRule('.widdio .icon.center',glue([
-			'position:absolute;'
-			,'left:50%;'
-			,'top:50%;'
-			,'width: 50px;'
-			,'height: 50px;'
-			,'margin: -25px 0 0 -25px;']));
-
-		addRule('.widdio .bar>*',glue([
-			'position:absolute;'
-			,'left:0;'
-			,'top:0;']));
-		addRule('.widdio .bar',glue([
-			'position:relative;'
-			,'width:1px;'
-			,'margin-top:10px;'
-			,'height:10px;'
-			,'background-color:#FFF;']));
-
-		addRule('.widdio .icon.center.play:hover',	'background-position: -240px 0px;');
-		addRule('.widdio .icon.center.pause:hover',	'background-position: -360px 0px;');
-		addRule('.widdio .icon.play:hover',			'background-position:    0px -30px;');
-		addRule('.widdio .icon.pause:hover',		'background-position:  -30px -30px;');
-		addRule('.widdio .icon.stop:hover',			'background-position:  -60px -30px;');
-		addRule('.widdio .icon.mute:hover',			'background-position:  -90px -30px;');
-		addRule('.widdio .icon.muted:hover',		'background-position: -120px -30px;');
-		addRule('.widdio .icon.fullscreen:hover',	'background-position: -150px -30px;');
-
-		addRule('.widdio .icon.play.center',		'background-position: -180px 0px;');
-		addRule('.widdio .icon.pause.center',		'background-position: -300px 0px;');
-		addRule('.widdio .icon.play',				'background-position:    0px 0px;');
-		addRule('.widdio .icon.pause',				'background-position:  -30px 0px;');
-		addRule('.widdio .icon.stop',				'background-position:  -60px 0px;');
-		addRule('.widdio .icon.mute',				'background-position:  -90px 0px;');
-		addRule('.widdio .icon.muted',				'background-position: -120px 0px;');
-		addRule('.widdio .icon.fullscreen',			'background-position: -150px 0px;');
-
-		addRule('.widdio .icon',glue([
-			'background-image: url(data:image/png;base64,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);'
-			,'backround-repeat: no-repeat;'
-			,'height: 30px;'
-			,'width: 30px;']));
-
-		addRule('.widdio .overlay',glue([
-			'position:absolute;'
-			,'left:0;'
-			,'top:0;'
-			,'width:100%;'
-			,'height:100%;']));
-
-		addRule('.widdio .controls>*',glue([
-			'position:relative;'
-			,'height:100%;'
-			,'overflow:hidden;'
-			,'display:block;'
-			,'float:left;'
-			,'cursor:pointer;'
-			,'text-align:center;']));
-
-		addRule('.widdio .fadeOut',glue([
-			'visibility:hidden;'
-			,'opacity:0;'
-			,'transition:visibility 0s 1000ms,opacity 1000ms linear;'
-			,'-webkit-transition:visibility 0s 1000ms,opacity 1000ms linear;']));
-
-		addRule('.widdio .icon.center.play, .widdio .controls',glue([
-			'visibility:visible;'
-			,'opacity:1;'
-			,'transition:opacity 200ms linear;'
-			,'-webkit-transition:opacity 200ms linear;']));
-
-		addRule('.widdio.'+oReturn.SIZE_FULLSCREEN+' .controls',glue([
-			'position:fixed;'
-			,'bottom:0;']));
-		addRule('.widdio .controls.over',glue([
-			'position:absolute;'
-			,'bottom:0;']));
-		addRule('.widdio .controls',glue([
-			'height:30px;'
-			,'overflow:hidden;'
-			,'background-color: rgba(0,0,0,0.4);']));
-
-		//addRule('.widdio.'+ww.SCALE_NOBARS+' video',
-		//	'overflow:hidden;');
-		addRule('.widdio.'+oReturn.SIZE_FULLSCREEN+' video',glue([
-			'width:100%;'
-			,'height:100%;']));
-		addRule('.widdio video',
-			'display:block;');
-
-		//addRule('.widdio.'+ww.SCALE_NOBARS+' .wrap',
-		//	'overflow:hidden;');
-
-		addRule('.widdio.'+oReturn.SCALE_NOBARS+' .staticwrap',glue([
-			'width:100%;'
-			,'height:100%;'
-			,'overflow:hidden;']));
-
-		addRule('.widdio.'+oReturn.SIZE_FULLSCREEN,glue([
-			'position:fixed;'
-			,'left:0;'
-			,'top:0;'
-			,'width:100%;'
-			,'height:100%;'
-			,'z-index:'+iMaxZ+';']));
-		addRule('.widdio',glue([
-			'position:relative;'
-			//,'overflow:hidden;'
-			,'z-index:auto;'
-			,'color:white;']));
-
-		//addRule('.widdio .icon.play::before,  .widdio .center.play::before',	'content:\'\';');	// String.fromCharCode(0xe047)
-		//addRule('.widdio .icon.pause::before, .widdio .center.pause::before',	'content:\'\';');	// String.fromCharCode(0xe049)
-		//addRule('.widdio .icon.stop:before',		'content:\'\';');								// String.fromCharCode(0xe04a)
-		//addRule('.widdio .icon.mute:before',		'content:\'\';');								// String.fromCharCode(0xe072)
-		//addRule('.widdio .icon.muted:before',		'content:\'\';');								// String.fromCharCode(0xe071)
-		//addRule('.widdio .icon.fullscreen:before',	'content:\'\';');								// String.fromCharCode(0xe04e)
-
-		if (sSheet!=='') $('head').append('<style>'+sSheet+'</style>');
-		//bCssAdded = true;
-		//
+		if (!bCannotAdd) {
+			sCSS.split('}').reverse().forEach(function(subst){
+				var rla = subst.split('{')
+					,sRule = rla.shift()
+					,sRules = rla.pop();
+				addRule(sRule,sRules);
+			});
+		} else {
+			createElement('style',undefined,document.querySelector('head')).innerHTML = sCSS;
+		}
 		/* jshint ignore:start */
 		// overwrite addCss method so we don't need a boolean check
 		addCss = function(){};
@@ -1057,15 +1026,6 @@ var widdio = (function(document,window,undefined) {
 			}
 		}
 		return oStyleSheet;
-	}
-
-	/**
-	 * Functional join with empty separator
-	 * @param {Array} a The array
-	 * @returns {string}
-	 */
-	function glue(a){
-		return a.join('');
 	}
 
 	/**

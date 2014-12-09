@@ -2,6 +2,7 @@
     "globals": {
     	"Event": true
     	,"NodeList": true
+    	,"DOMTokenList": true
 	},
     "strict": true,
     "browser": true,
