@@ -1,19 +1,22 @@
 {
-	"name": "widdio",
-	"version": "2.0.3",
-	"description": "A simple HTML5 video player",
-	"devDependencies": {
-		"load-grunt-tasks": "~0.4.0",
-		"time-grunt": "~0.3.1",
-		"grunt": "~0.4.2",
-		"grunt-contrib-watch": "~0.6.1",
-		"grunt-contrib-jshint": "~0.8.0",
-		"grunt-contrib-copy": "~0.4.1",
-		"grunt-contrib-clean": "~0.6.0",
-		"grunt-contrib-less": "~0.8.3",
-		"grunt-contrib-uglify": "~0.2.7",
-		"grunt-contrib-rename": "0.0.3",
-		"grunt-version-git": "~0.1.7",
-		"phantomjs": "~1.9.12"
-	}
+  "name": "widdio",
+  "version": "2.0.4",
+  "description": "A simple HTML5 video player",
+  "devDependencies": {
+    "load-grunt-tasks": "~0.4.0",
+    "time-grunt": "~0.3.1",
+    "grunt": "~0.4.2",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-less": "~0.8.3",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-rename": "0.0.3",
+    "grunt-version-git": "~0.1.7",
+    "phantomjs": "~1.9.12",
+    "grunt-jscs": "~1.0.0",
+    "adm-zip": "~0.4.4",
+    "xml2js": "~0.4.4"
+  }
 }

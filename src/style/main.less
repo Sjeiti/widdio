@@ -1,5 +1,7 @@
 @maxZ: 2147483647;
 
+@import 'svgIcons';
+
 .widdio {
 	position: relative;
 	z-index: auto;
@@ -80,8 +82,8 @@
 		height: 30px;
 		width: 30px;
 
-		&.play.center {background-position: -180px 0px;}
-		&.pause.center {background-position: -300px 0px;}
+//		&.play.center {background-position: -180px 0px;}
+//		&.pause.center {background-position: -300px 0px;}
 		&.play {background-position: 0px 0px;}
 		&.pause {background-position: -30px 0px;}
 		&.stop {background-position: -60px 0px;}
@@ -89,8 +91,8 @@
 		&.muted {background-position: -120px 0px;}
 		&.fullscreen {background-position: -150px 0px;}
 
-		&.center.play:hover {background-position: -240px 0px;}
-		&.center.pause:hover {background-position: -360px 0px;}
+//		&.center.play:hover {background-position: -240px 0px;}
+//		&.center.pause:hover {background-position: -360px 0px;}
 		&.play:hover {background-position: 0px -30px;}
 		&.pause:hover {background-position: -30px -30px;}
 		&.stop:hover {background-position: -60px -30px;}
@@ -99,6 +101,8 @@
 		&.fullscreen:hover {background-position: -150px -30px;}
 
 		&.center {
+			.icon-play;
+//			.icon-volume-high;
 			position: absolute;
 			left: 50%;
 			top: 50%;
