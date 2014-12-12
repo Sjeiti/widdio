@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.5
+ * @version 2.0.6
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -53,17 +53,13 @@ var widdio = (function(document,window,undefined) {
 		//
 		,aWiddioObj = []
 		//
-		// browser/device detection
-		,bWebkit = false//$.browser.webkit
-		//,bIOs = !!navigator.userAgent.match(/iPod|iPhone|iPad/i)
-		,bIPad = !!navigator.userAgent.match(/iPad/i)
-		//
 		,fnFullscreen
+		,fnFullscreenExit
 		//
 		,sClassnameHide = 'fadeOut'
 		//
 		,oSVGIcons = {"contract":"M2 18h12v12l-4.321-4.321-6.313 6.313-3.359-3.359 6.313-6.313zM25.679 22.321l6.313 6.313-3.359 3.359-6.313-6.313-4.321 4.321v-12h12zM30 14h-12v-12l4.321 4.321 6.313-6.313 3.359 3.359-6.313 6.313zM9.679 6.321l4.321-4.321v12h-12l4.321-4.321-6.313-6.313 3.359-3.359z","envelope":"M29 4h-26c-1.65 0-3 1.35-3 3v20c0 1.65 1.35 3 3 3h26c1.65 0 3-1.35 3-3v-20c0-1.65-1.35-3-3-3zM12.461 17.199l-8.461 6.59v-15.676l8.461 9.086zM5.512 8h20.976l-10.488 7.875-10.488-7.875zM12.79 17.553l3.21 3.447 3.21-3.447 6.58 8.447h-19.579l6.58-8.447zM19.539 17.199l8.461-9.086v15.676l-8.461-6.59z","expand":"M32 0v12l-4.321-4.321-6.625 6.625-3.359-3.359 6.625-6.625-4.321-4.321zM7.679 4.321l6.625 6.625-3.359 3.359-6.625-6.625-4.321 4.321v-12h12zM27.679 24.321l4.321-4.321v12h-12l4.321-4.321-6.625-6.625 3.359-3.359zM14.304 21.054l-6.625 6.625 4.321 4.321h-12v-12l4.321 4.321 6.625-6.625z","facebook":"M26.667 0h-21.333c-2.933 0-5.334 2.4-5.334 5.334v21.332c0 2.936 2.4 5.334 5.334 5.334l21.333-0c2.934 0 5.333-2.398 5.333-5.334v-21.332c0-2.934-2.399-5.334-5.333-5.334zM27.206 16h-5.206v14h-6v-14h-2.891v-4.58h2.891v-2.975c0-4.042 1.744-6.445 6.496-6.445h5.476v4.955h-4.473c-1.328-0.002-1.492 0.692-1.492 1.985l-0.007 2.48h6l-0.794 4.58z","pause":"M4 4h10v24h-10zM18 4h10v24h-10z","play":"M6 4l20 12-20 12z","stop":"M4 4h24v24h-24z","twitter":"M32 6.076c-1.177 0.522-2.443 0.875-3.771 1.034 1.355-0.813 2.396-2.099 2.887-3.632-1.269 0.752-2.674 1.299-4.169 1.593-1.198-1.276-2.904-2.073-4.792-2.073-3.626 0-6.565 2.939-6.565 6.565 0 0.515 0.058 1.016 0.17 1.496-5.456-0.274-10.294-2.888-13.532-6.86-0.565 0.97-0.889 2.097-0.889 3.301 0 2.278 1.159 4.287 2.921 5.465-1.076-0.034-2.088-0.329-2.974-0.821-0.001 0.027-0.001 0.055-0.001 0.083 0 3.181 2.263 5.834 5.266 6.437-0.551 0.15-1.131 0.23-1.73 0.23-0.423 0-0.834-0.041-1.235-0.118 0.835 2.608 3.26 4.506 6.133 4.559-2.247 1.761-5.078 2.81-8.154 2.81-0.53 0-1.052-0.031-1.566-0.092 2.905 1.863 6.356 2.95 10.064 2.95 12.076 0 18.679-10.004 18.679-18.68 0-0.285-0.006-0.568-0.019-0.849 1.283-0.926 2.396-2.082 3.276-3.398z","volume-high":"M27.814 28.814c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.739-2.739 4.247-6.38 4.247-10.253s-1.508-7.514-4.247-10.253c-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c3.305 3.305 5.126 7.7 5.126 12.374s-1.82 9.069-5.126 12.374c-0.293 0.293-0.677 0.439-1.061 0.439zM22.485 25.985c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 4.094-4.094 4.094-10.755 0-14.849-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546c-0.293 0.293-0.677 0.439-1.061 0.439zM17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-low":"M17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-medium":"M22.485 25.985c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 4.094-4.094 4.094-10.755 0-14.849-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546c-0.293 0.293-0.677 0.439-1.061 0.439zM17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-mute":"M12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-mute2":"M12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542zM30 19.348v2.652h-2.652l-3.348-3.348-3.348 3.348h-2.652v-2.652l3.348-3.348-3.348-3.348v-2.652h2.652l3.348 3.348 3.348-3.348h2.652v2.652l-3.348 3.348z"}
-		,sCSS = '.clearfix{zoom:1}.clearfix:before,.clearfix:after{content:\'\';display:table}.clearfix:after{clear:both}.widdio{position:relative;z-index:auto;color:white}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483647}.widdio.nobars .staticwrap{width:100%;height:100%;overflow:hidden}.widdio.fullscreen video{width:100%;height:100%}.widdio .staticwrap{height:100%}.widdio video{display:block}.widdio .controls{height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4)}.widdio .controls.over{position:absolute;bottom:0}.widdio .controls>*{position:relative;height:100%;overflow:hidden;display:block;float:left;cursor:pointer;text-align:center}.widdio.fullscreen .controls{position:fixed;bottom:0}.widdio .icon.center.play,.widdio .controls{visibility:visible;opacity:1;transition:opacity 200ms linear;-webkit-transition:opacity 200ms linear}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}.widdio .icon{height:30px;width:30px;padding:4px}.widdio .icon svg{width:100%;height:100%}.widdio .icon path{-webkit-transition:fill 300ms linear;-moz-transition:fill 300ms linear;-ms-transition:fill 300ms linear;-o-transition:fill 300ms linear;transition:fill 300ms linear;fill:#fff}.widdio .icon:hover path{fill:#d0ffea}.widdio .icon.play path.pause{display:none}.widdio .icon.pause path.play{display:none}.widdio .icon.mute path.volume-mute{display:none}.widdio .icon.muted path.volume-medium{display:none}.widdio .icon.fullscreen path.contract{display:none}.widdio .icon.center{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;padding:0}.widdio.fullscreen .icon.fullscreen path.expand{display:none}.widdio.fullscreen .icon.fullscreen path.contract{display:block}.widdio .overlay{position:absolute;left:0;top:0;width:100%;height:100%}.widdio .overlay:hover path{fill:#d0ffea}.widdio .bar{position:relative;width:1px;margin-top:10px;height:10px;background-color:#fff}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{font-weight:bold;font-size:12px;line-height:30px}'
+		,sCSS = '.clearfix{zoom:1}.clearfix:before,.clearfix:after{content:\'\';display:table}.clearfix:after{clear:both}.widdio{position:relative;z-index:auto;color:white}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483647}.widdio.nobars .staticwrap{width:100%;height:100%;overflow:hidden}.widdio.fullscreen video{width:100%;height:100%}.widdio .staticwrap{height:100%}.widdio video{display:block;margin-left:50%;-webkit-transform:translateX(-50%);-moz-transform:translateX(-50%);-ms-transform:translateX(-50%);-o-transform:translateX(-50%);transform:translateX(-50%)}.widdio .controls{height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4)}.widdio .controls.over{position:absolute;bottom:0}.widdio .controls>*{position:relative;height:100%;overflow:hidden;display:block;float:left;cursor:pointer;text-align:center}.widdio.fullscreen .controls{position:fixed;bottom:0}.widdio .icon.center.play,.widdio .controls{visibility:visible;opacity:1;transition:opacity 200ms linear;-webkit-transition:opacity 200ms linear}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}.widdio .icon{height:30px;width:30px;padding:4px}.widdio .icon svg{width:100%;height:100%}.widdio .icon path{-webkit-transition:fill 300ms linear;-moz-transition:fill 300ms linear;-ms-transition:fill 300ms linear;-o-transition:fill 300ms linear;transition:fill 300ms linear;fill:#fff}.widdio .icon:hover path{fill:#d0ffea}.widdio .icon.play path.pause{display:none}.widdio .icon.pause path.play{display:none}.widdio .icon.mute path.volume-mute{display:none}.widdio .icon.muted path.volume-medium{display:none}.widdio .icon.fullscreen path.contract{display:none}.widdio .icon.center{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;padding:0}.widdio.fullscreen .icon.fullscreen path.expand{display:none}.widdio.fullscreen .icon.fullscreen path.contract{display:block}.widdio .overlay{position:absolute;left:0;top:0;width:100%;height:100%}.widdio .overlay:hover path{fill:#d0ffea}.widdio .bar{position:relative;width:1px;margin-top:10px;height:10px;background-color:#fff}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{font-weight:bold;font-size:12px;line-height:30px}'
 		//
 		,oReturn = {
 			// exposed functions
@@ -189,6 +185,7 @@ var widdio = (function(document,window,undefined) {
 		mBody = document.body;
 		mHead = document.head;
 		fnFullscreen = mBody.requestFullScreen||mBody.webkitRequestFullScreen||mBody.mozRequestFullScreen;//||mBody.msRequestFullScreen;
+		fnFullscreenExit = (document.exitFullScreen||document.webkitCancelFullScreen||document.mozCancelFullScreen).bind(document);//||mBody.msRequestFullScreen;
 	}
 
 	/**
@@ -225,7 +222,24 @@ var widdio = (function(document,window,undefined) {
 	 * @param {Event} e
 	 */
 	function handleFullscreenChange(e){
-		if (!isFullscreen()) getWiddio(e.target).setFullscreenView();
+		var mTarget = e.target
+			,oWiddio = getWiddio(mTarget)
+			,bFullscreen = isFullscreen()
+		;
+		bFullscreen;
+		if (oWiddio) {
+			if (bFullscreen) {
+				oWiddio.setFullscreenView(true);
+			} else {
+				oWiddio.setFullscreenView();
+			}
+			//else oWiddio.setFullscreenView(true); // doesn't work, has to be before change
+//			if (bFullscreen) mTarget.classList.add(oReturn.SIZE_FULLSCREEN);
+//			else mTarget.classList.remove(oReturn.SIZE_FULLSCREEN);
+//			oWiddio.resize();
+		}
+		//if (!isFullscreen()) getWiddio(e.target).setFullscreenView();
+		//console.log('handleFullscreenChange',isFullscreen(),getWiddio(e.target).id); // log
 	}
 
 	/**
@@ -361,7 +375,7 @@ var widdio = (function(document,window,undefined) {
 			mVideo.controls = false;
 			//
 			// fix iPad
-			if (bIPad) {
+			if (!!navigator.userAgent.match(/iPad/i)) {
 				Array.prototype.forEach.call(axSources,function(source){
 					var bCanPlay = mVideo.canPlayType(source.getAttribute('type'));
 					if (bCanPlay) mVideo.setAttribute('src',source.getAttribute('src'));
@@ -556,21 +570,36 @@ var widdio = (function(document,window,undefined) {
 		 * Resize the widdio instance
 		 */
 		function resize() {
-			switch (oSettings.size) {
-				case oReturn.SIZE_ORIGINAL:
-					iWidW = iVidW;
-					iWidH = iVidH;
-				break;
-				case oReturn.SIZE_FIXED:
-					iWidW = oSettings.width;
-					iWidH = oSettings.height;
-				break;
-				case oReturn.SIZE_FULLSCREEN:
-					iWidW = iScrW;
-					iWidH = iScrH;
-				break;
+			var sSettingsSize = oSettings.size;
+			mWiddio.removeAttribute('style');
+			if (sSettingsSize===oReturn.SIZE_FULLSCREEN) {
+				iWidW = iScrW;
+				iWidH = iScrH;
+			} else if (sSettingsSize===oReturn.SIZE_FIXED) {
+				iWidW = oSettings.width;
+				iWidH = oSettings.height;
+			} else if (sSettingsSize===oReturn.SIZE_ORIGINAL) {
+				iWidW = iVidW;
+				iWidH = iVidH;
+			} else if (sSettingsSize===oReturn.SIZE_DYNAMIC) {
+				iWidW = mWiddio.offsetWidth;
+				iWidH = mWiddio.offsetHeight;
 			}
-			fWidAspR = iWidW/iWidH;
+			//
+			//##
+			console.log('resize'
+				,'\n\t',sSettingsSize
+				,'\n\t','iVidW',iVidW
+				,'\n\t','iVidH',iVidH
+				,'\n\t','iWidW',iWidW
+				,'\n\t','iWidH',iWidH
+				,'\n\t','mWiddio.offsetWidth',mWiddio.offsetWidth
+				,'\n\t','mWiddio.offsetHeight',mWiddio.offsetHeight
+				,'\n\t','oSettings.width',oSettings.width
+				,'\n\t','oSettings.height',oSettings.height
+			); // log
+			//##
+			fWidAspR = iWidW/iWidH;//iVidW/iVidH;//
 			mWiddio.style.width = iWidW+'px';
 			//
 			if (oSettings.size!==oReturn.SIZE_FULLSCREEN) {
@@ -582,7 +611,28 @@ var widdio = (function(document,window,undefined) {
 				}
 			}
 			var iWH = iWidH + (oSettings.size!==oReturn.SIZE_FULLSCREEN&&oSettings.controlsPosition!==oReturn.CONTROLS_OVER?iControlsHeight:0);
-			mWiddio.style.width = iWH+'px';
+			mWiddio.style.height = iWH+'px';
+
+
+			/*fWidAspR = iWidW/iWidH;
+			mWiddio.style.width = iWidW+'px';
+			//
+			if (oSettings.size!==oReturn.SIZE_FULLSCREEN) {
+				var iWreal = mWiddio.offsetWidth;
+				var bWisW = iWreal===iWidW;
+				if (!bWisW) {
+					iWidH = parseInt(iWidH*(iWreal/iWidW));
+					iWidW = iWreal;
+				}
+			}
+			if (iWidH) {
+				var iWH = iWidH + (oSettings.size!==oReturn.SIZE_FULLSCREEN&&oSettings.controlsPosition!==oReturn.CONTROLS_OVER?iControlsHeight:0);
+				mWiddio.style.width = iWH+'px';
+			} else {
+				mWiddio.style.width = 'auto';
+			}*/
+			console.log('resize',isFullscreen(),sSettingsSize,iVidW,iWidW,iWidH,mWiddio.style.width); // log
+			//##
 			resizeVideo();
 			resizeControls();
 			resizeScrub();
@@ -592,8 +642,8 @@ var widdio = (function(document,window,undefined) {
 		 * Resize the instance video
 		 */
 		function resizeVideo() {//todo:iWidW
-			var sL = 'auto';//todo:iWidW
-			var sT = 'auto';//todo:iWidW
+//			var sL = 'auto';//todo:iWidW
+//			var sT = 'auto';//todo:iWidW
 			var sW = '100%';//todo:iWidW
 			var sH = '100%';//todo:iWidW
 			mWiddio.style.width = iWidW+'px';
@@ -606,11 +656,11 @@ var widdio = (function(document,window,undefined) {
 				var fTmpAspR = bFullscreen?fScrAspR:fWidAspR;
 				if (fTmpAspR>fVidAspR) {
 					var iTH = Math.floor(iTmpW/fVidAspR);
-					sT = parseInt((iTmpH-iTH)/2)+'px';
+//					sT = parseInt((iTmpH-iTH)/2)+'px';
 					sH = iTH+'px';
 				} else {
 					var iTW = Math.floor(iTmpH*fVidAspR);
-					sL = parseInt((iTmpW-iTW)/2)+'px';
+//					sL = parseInt((iTmpW-iTW)/2)+'px';
 					sW = iTW+'px';
 					sH = iTmpH+'px';
 				}
@@ -620,8 +670,8 @@ var widdio = (function(document,window,undefined) {
 			}
 			mWrap.style.width = sW;
 			mWrap.style.height = sH;
-			mVideo.style.marginLeft = sL;
-			mVideo.style.marginTop = sT;
+//			mVideo.style.marginLeft = sL;
+//			mVideo.style.marginTop = sT;
 		}
 
 		/**
@@ -633,7 +683,7 @@ var widdio = (function(document,window,undefined) {
 			if (iOverW) mControls.style.width = (iWidW-iOverW)+'px';
 		}
 
-		//var iReisizeScrub;
+		//var iResizeScrub;
 		/**
 		 * Resize the instance scrub control
 		 * @todo does not always init with multiple videos
@@ -658,31 +708,13 @@ var widdio = (function(document,window,undefined) {
 		 * Toggle instance fullscreen
 		 */
 		function toggleFullscreen(){
-			//console.log('toggleFullscreen',!!fnFullscreen,bWebkit); // log
 			// browser fullscreen (with user interface)
-			if (fnFullscreen||bWebkit) {
-				if (fnFullscreen) {
-					if (isFullscreen()) {
-						// this is fucking stupid... why doesn't this work: (document.exitFullScreen||document.webkitCancelFullScreen||document.mozCancelFullScreen)();
-						if (document.exitFullScreen) document.exitFullScreen();
-						else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();
-						else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-					} else {
-						setFullscreenView(true);
-						try	{ // try/catch because mozilla tends to screw it
-							fnFullscreen.call(mWiddio);
-						} catch(err) {
-							console.log(err+' reverting to fake fullscreen'); // log
-							fnFullscreen = null; // todo: wrong solution...
-						}
-					}
+			if (fnFullscreen) {
+				if (isFullscreen()) {
+					fnFullscreenExit();
 				} else {
-					setFullscreenView();
+					fnFullscreen.call(mWiddio);
 				}
-
-			// webkit video fullscreen (reverts to native webkit user interface)
-			} else if (bWebkit&&mVideo.webkitSupportsFullscreen) { // &&!oVideo.webkitDisplayingFullscreen
-				mVideo.webkitEnterFullscreen();
 			} else {
 				setFullscreenView();
 			}
@@ -693,12 +725,14 @@ var widdio = (function(document,window,undefined) {
 		 * @param {boolean} toFullscreen
 		 */
 		function setFullscreenView(toFullscreen){
+			console.log('setFullscreenView',sVideoID,toFullscreen); // log
 			if (toFullscreen===undefined) toFullscreen = oSettings.size!==oReturn.SIZE_FULLSCREEN;
 			//
 			var bPlaying = !mVideo.paused;
 			mWiddio.classList.remove(oSettings.size);
 			if (toFullscreen) {
 				sOriginalSize = oSettings.size; // store size when going fullscreen
+				console.log('sOriginalSize',sOriginalSize); // log
 				oSettings.size = oReturn.SIZE_FULLSCREEN;
 				if (!fnFullscreen) {
 					mWiddioGhost = createDiv();
@@ -707,6 +741,7 @@ var widdio = (function(document,window,undefined) {
 				}
 			} else {
 				oSettings.size = sOriginalSize?sOriginalSize:oReturn.SIZE_ORIGINAL;
+				mWiddio.removeAttribute('style');
 				if (mWiddioGhost) {
 					mParent.appendChild(mWiddio,mWiddioGhost);
 					mParent.removeChild(mWiddioGhost);
@@ -714,6 +749,7 @@ var widdio = (function(document,window,undefined) {
 				}
 			}
 			mWiddio.classList.add(oSettings.size);
+			console.log('oSettings.size',oSettings.size); // log
 			resize();
 			!fnFullscreen&&bPlaying&&mVideo.play();
 		}
@@ -966,6 +1002,7 @@ var widdio = (function(document,window,undefined) {
 			,resize:			resize
 			,setFullscreenView:	setFullscreenView
 			,pause:				pause
+			,id:				sVideoID
 		};
 	}
 	//################################################################################################################
