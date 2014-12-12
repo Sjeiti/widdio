@@ -1,6 +1,10 @@
 @maxZ: 2147483647;
 
-@import 'svgIcons';
+@colorIcon: white;
+@colorIconHover: #d0ffea;
+@colorControlBg: rgba(0, 0, 0, 0.4);
+
+@import 'mixins';
 
 .widdio {
 	position: relative;
@@ -35,7 +39,7 @@
 	.controls {
 		height: 30px;
 		overflow: hidden;
-		background-color: rgba(0, 0, 0, 0.4);
+		background-color: @colorControlBg;
 		&.over {
 			position: absolute;
 			bottom: 0;
@@ -68,48 +72,51 @@
 		-webkit-transition: visibility 0s 1000ms, opacity 1000ms linear;
 	}
 
-	.overlay {
-		position: absolute;
-		left: 0;
-		top: 0;
-		width: 100%;
-		height: 100%;
-	}
-
 	.icon {
-		background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaQAAAA8CAYAAAApDs6vAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABb9JREFUeNrs3U9O4zAchmEHzS3YNrMYcQI4QXoJdnRZNpyCDVnCjku0J2hPMGJBu+UcGX4ztsZUCU0b27Hj95EiIVGa2in54j9xiqZpFAAAYysIJAAAgQQAAIEEACCQAAAgkAAABBIAAB0ujvx+9rltRvhcss+mZXu2PlfTsS3P3Ofym/fsu7k0s8o7tGwxWbYczz514aueASQSSOL6xJMH3NjZLVm9/dLHYuY5MEJchMw/t0XP1+51+V/4WgB5B5JxN6Gr9Nh1hb+cwEsdVpWH/cp7PgUKo/UZf7cglAACyfYU4Co9Z5UOf1tj1fleh9LK8TGY6ff0rbbC6Fn17w6trFACQCB9sVP057vWFQqmy26nT+ISSvef24PDfb9S/QBSDST76n1DVXoNBTOGV1gti1q3pFy0kuT9rql+AGP64eh9zMQH6d+nS+V0myOBIEFkJhvc6Lp+1PVd6haTj/3meixuB9TpqD6a6ZX3suBLOeD4JnXMLhx/DiY++DtJ1vrnmRVEb5/bT6rHuV1mrf5cytt1O0mfsUtl/f+NfUvIZMt74akinjoKB6Qit9sduL0Do/MVSDLgLo22NVXsxI11opCulSt9VSv3Jb1TPV7dZXZxlVt5MeFAetFBVFO1JweO1Nu24/eN9bqqJZiG7hfHrVRetzvkVl5EwNWkhq0+uWGY246AKQ5OFKUOpt/KzWB0OTDYcrLL7Pu+4/8bKbWQCr6szki4zDt+ZwYX5/p1EkyPDvd7T/X3xvgSEFkglYruHh9k3O1weZxGX6macTk7mFypVZhleaqR/94lxpeAkQPJTFjYU33eLFpaoYX6v9ROqfxMGJH9bj2XTaapb6z9FT23tT4RriI8XowvAYEDiQkLYZUHLSTZ3gJcDITofj21C8h0V64iP2a5LafF8mFwqs+khjEGNI/tzzyOwKU6srDdWy2lIrL6D13Pe5VW93Buq5awSguCtJD2igkLwDlyW7WEVVrgPZAADJPb41p4PA0IJCByjC8BBBIQldzu5+H+JRBIQMQYXwIIJCAqjC8BBBIQFcaXAHXkPqQPvjJIVGJPGR3y1N8U5VZe0EICopfbMlwsO4bzW0gAvMhtVQNWcQCBBESooLxAO7rsgDBye1wLj6cBgQREhnEiwFEgyf0CmxE+l+yzadmerc/VdGzn3ny3/OY9+24uzazyDi1bTJYtx7NPXfiqZ19ye1wLj6dBkBYSjy8ex8762Tyk7pfyf2PhMtBFiDzxtu9At3n8xEsix65QeQ3i51ZejBhIBst/hNMV/vJPX+qw8vEYaXnPp0BhdM4TbxeRhxLjRECgQDJY/sOvSoe/rbHqfK9PBCvHx2CmwjyRtbbC6Fn17w6trFCKzVzlNW6SW3kRcSAZLP/hXlcomC67nT6Jy4lABo8fHO77leo/mRk3WVNeYNxAsq/eN1Sl11AwY3iF1bKodUvKRStJ3u+a6u9tq/IaN8mtvEg4kJRi4sNQZlZhVyjIyeBNv25hBZFcsZYO9nvHIehN6vuG8gLxBpLBxAd/gWWm09pBJCH1k+oJgnEiILFAMszEh4oqRuIYJwISD6R7vtROSZeJ6Q6VK9Yr9W+Cg9yX9E71eME4ERCY68VVWdX3/MAR0jXXNo7U6Lq9sVqdJpgeHeyX2ZJf8Xyiaf+fDWFu0qa8EQfSVjHw6cKt+rpCg2F/IVb6BCLB9NvRiaTs2G/OFwdJOuPBhPzfTvv4JsVFl13Bl9oZCZd5x+/Mem5z/brVwNbR4X7vqX4AqQYSy4b4IeNuh8vjNLoFY8bl7GBypVZhluWpRv57ABMKJJaX92/R0gqVzSy1Uyo/E0Zkv1vPZZNp6htrf0XPba3DaMXXAyCQWF4+rPKghSTbW4CLgRDdr6feSG26KwkjYMKKpumeYPXR/D0RvCrGiJCYSzqTgWkFEgAABBIAgEACAIBAAgAQSAAAEEgAgKz9EWAAkc4AQ3pB7rEAAAAASUVORK5CYII=);
-		backround-repeat: no-repeat;
 		height: 30px;
 		width: 30px;
+		padding: 4px;
 
-//		&.play.center {background-position: -180px 0px;}
-//		&.pause.center {background-position: -300px 0px;}
-		&.play {background-position: 0px 0px;}
-		&.pause {background-position: -30px 0px;}
-		&.stop {background-position: -60px 0px;}
-		&.mute {background-position: -90px 0px;}
-		&.muted {background-position: -120px 0px;}
-		&.fullscreen {background-position: -150px 0px;}
+		svg {
+			width: 100%;
+			height: 100%;
+		}
+		path {
+			.transition(fill 300ms linear);
+			fill: @colorIcon;
+		}
+		&:hover path { fill: @colorIconHover; }
 
-//		&.center.play:hover {background-position: -240px 0px;}
-//		&.center.pause:hover {background-position: -360px 0px;}
-		&.play:hover {background-position: 0px -30px;}
-		&.pause:hover {background-position: -30px -30px;}
-		&.stop:hover {background-position: -60px -30px;}
-		&.mute:hover {background-position: -90px -30px;}
-		&.muted:hover {background-position: -120px -30px;}
-		&.fullscreen:hover {background-position: -150px -30px;}
+		&.play path.pause { display:none; }
+		&.pause path.play { display:none; }
+
+		&.mute path.volume-mute { display:none; }
+		&.muted path.volume-medium { display:none; }
+
+		&.fullscreen path.contract { display:none; }
 
 		&.center {
-			.icon-play;
-//			.icon-volume-high;
 			position: absolute;
 			left: 50%;
 			top: 50%;
 			width: 50px;
 			height: 50px;
 			margin: -25px 0 0 -25px;
+			padding: 0;
 		}
+	}
+	&.fullscreen .icon.fullscreen {
+		path.expand { display:none; }
+		path.contract { display:block; }
+	}
+
+	.overlay {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		&:hover path { fill: @colorIconHover; }
 	}
 
 	.bar {
@@ -117,7 +124,7 @@
 		width: 1px;
 		margin-top: 10px;
 		height: 10px;
-		background-color: #FFF;
+		background-color: @colorIcon;
 		> * {
 			position: absolute;
 			left: 0;

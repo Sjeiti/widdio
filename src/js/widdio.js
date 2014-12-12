@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.3
+ * @version 2.0.5
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -45,6 +45,7 @@ var widdio = (function(document,window,undefined) {
 	var createDiv = createElement.bind(undefined,undefined)
 		//
 		,mBody
+		,mHead
 		//
 		,iScrW		// screen width
 		,iScrH		// screen height
@@ -61,7 +62,8 @@ var widdio = (function(document,window,undefined) {
 		//
 		,sClassnameHide = 'fadeOut'
 		//
-		,sCSS = '.widdio{position:relative;z-index:auto;color:white}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483647}.widdio.nobars .staticwrap{width:100%;height:100%;overflow:hidden}.widdio.fullscreen video{width:100%;height:100%}.widdio .staticwrap{height:100%}.widdio video{display:block}.widdio .controls{height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4)}.widdio .controls.over{position:absolute;bottom:0}.widdio .controls>*{position:relative;height:100%;overflow:hidden;display:block;float:left;cursor:pointer;text-align:center}.widdio.fullscreen .controls{position:fixed;bottom:0}.widdio .icon.center.play,.widdio .controls{visibility:visible;opacity:1;transition:opacity 200ms linear;-webkit-transition:opacity 200ms linear}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}.widdio .overlay{position:absolute;left:0;top:0;width:100%;height:100%}.widdio .icon{background-image:url(data:image/png;base64,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);backround-repeat:no-repeat;height:30px;width:30px}.widdio .icon.play.center{background-position:-180px 0}.widdio .icon.pause.center{background-position:-300px 0}.widdio .icon.play{background-position:0px 0px}.widdio .icon.pause{background-position:-30px 0}.widdio .icon.stop{background-position:-60px 0}.widdio .icon.mute{background-position:-90px 0}.widdio .icon.muted{background-position:-120px 0}.widdio .icon.fullscreen{background-position:-150px 0}.widdio .icon.center.play:hover{background-position:-240px 0}.widdio .icon.center.pause:hover{background-position:-360px 0}.widdio .icon.play:hover{background-position:0 -30px}.widdio .icon.pause:hover{background-position:-30px -30px}.widdio .icon.stop:hover{background-position:-60px -30px}.widdio .icon.mute:hover{background-position:-90px -30px}.widdio .icon.muted:hover{background-position:-120px -30px}.widdio .icon.fullscreen:hover{background-position:-150px -30px}.widdio .icon.center{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px}.widdio .bar{position:relative;width:1px;margin-top:10px;height:10px;background-color:#FFF}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{font-weight:bold;font-size:12px;line-height:30px}'
+		,oSVGIcons = {"contract":"M2 18h12v12l-4.321-4.321-6.313 6.313-3.359-3.359 6.313-6.313zM25.679 22.321l6.313 6.313-3.359 3.359-6.313-6.313-4.321 4.321v-12h12zM30 14h-12v-12l4.321 4.321 6.313-6.313 3.359 3.359-6.313 6.313zM9.679 6.321l4.321-4.321v12h-12l4.321-4.321-6.313-6.313 3.359-3.359z","envelope":"M29 4h-26c-1.65 0-3 1.35-3 3v20c0 1.65 1.35 3 3 3h26c1.65 0 3-1.35 3-3v-20c0-1.65-1.35-3-3-3zM12.461 17.199l-8.461 6.59v-15.676l8.461 9.086zM5.512 8h20.976l-10.488 7.875-10.488-7.875zM12.79 17.553l3.21 3.447 3.21-3.447 6.58 8.447h-19.579l6.58-8.447zM19.539 17.199l8.461-9.086v15.676l-8.461-6.59z","expand":"M32 0v12l-4.321-4.321-6.625 6.625-3.359-3.359 6.625-6.625-4.321-4.321zM7.679 4.321l6.625 6.625-3.359 3.359-6.625-6.625-4.321 4.321v-12h12zM27.679 24.321l4.321-4.321v12h-12l4.321-4.321-6.625-6.625 3.359-3.359zM14.304 21.054l-6.625 6.625 4.321 4.321h-12v-12l4.321 4.321 6.625-6.625z","facebook":"M26.667 0h-21.333c-2.933 0-5.334 2.4-5.334 5.334v21.332c0 2.936 2.4 5.334 5.334 5.334l21.333-0c2.934 0 5.333-2.398 5.333-5.334v-21.332c0-2.934-2.399-5.334-5.333-5.334zM27.206 16h-5.206v14h-6v-14h-2.891v-4.58h2.891v-2.975c0-4.042 1.744-6.445 6.496-6.445h5.476v4.955h-4.473c-1.328-0.002-1.492 0.692-1.492 1.985l-0.007 2.48h6l-0.794 4.58z","pause":"M4 4h10v24h-10zM18 4h10v24h-10z","play":"M6 4l20 12-20 12z","stop":"M4 4h24v24h-24z","twitter":"M32 6.076c-1.177 0.522-2.443 0.875-3.771 1.034 1.355-0.813 2.396-2.099 2.887-3.632-1.269 0.752-2.674 1.299-4.169 1.593-1.198-1.276-2.904-2.073-4.792-2.073-3.626 0-6.565 2.939-6.565 6.565 0 0.515 0.058 1.016 0.17 1.496-5.456-0.274-10.294-2.888-13.532-6.86-0.565 0.97-0.889 2.097-0.889 3.301 0 2.278 1.159 4.287 2.921 5.465-1.076-0.034-2.088-0.329-2.974-0.821-0.001 0.027-0.001 0.055-0.001 0.083 0 3.181 2.263 5.834 5.266 6.437-0.551 0.15-1.131 0.23-1.73 0.23-0.423 0-0.834-0.041-1.235-0.118 0.835 2.608 3.26 4.506 6.133 4.559-2.247 1.761-5.078 2.81-8.154 2.81-0.53 0-1.052-0.031-1.566-0.092 2.905 1.863 6.356 2.95 10.064 2.95 12.076 0 18.679-10.004 18.679-18.68 0-0.285-0.006-0.568-0.019-0.849 1.283-0.926 2.396-2.082 3.276-3.398z","volume-high":"M27.814 28.814c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.739-2.739 4.247-6.38 4.247-10.253s-1.508-7.514-4.247-10.253c-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c3.305 3.305 5.126 7.7 5.126 12.374s-1.82 9.069-5.126 12.374c-0.293 0.293-0.677 0.439-1.061 0.439zM22.485 25.985c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 4.094-4.094 4.094-10.755 0-14.849-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546c-0.293 0.293-0.677 0.439-1.061 0.439zM17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-low":"M17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-medium":"M22.485 25.985c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 4.094-4.094 4.094-10.755 0-14.849-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546c-0.293 0.293-0.677 0.439-1.061 0.439zM17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-mute":"M12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-mute2":"M12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542zM30 19.348v2.652h-2.652l-3.348-3.348-3.348 3.348h-2.652v-2.652l3.348-3.348-3.348-3.348v-2.652h2.652l3.348 3.348 3.348-3.348h2.652v2.652l-3.348 3.348z"}
+		,sCSS = '.clearfix{zoom:1}.clearfix:before,.clearfix:after{content:\'\';display:table}.clearfix:after{clear:both}.widdio{position:relative;z-index:auto;color:white}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%;height:100%;z-index:2147483647}.widdio.nobars .staticwrap{width:100%;height:100%;overflow:hidden}.widdio.fullscreen video{width:100%;height:100%}.widdio .staticwrap{height:100%}.widdio video{display:block}.widdio .controls{height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4)}.widdio .controls.over{position:absolute;bottom:0}.widdio .controls>*{position:relative;height:100%;overflow:hidden;display:block;float:left;cursor:pointer;text-align:center}.widdio.fullscreen .controls{position:fixed;bottom:0}.widdio .icon.center.play,.widdio .controls{visibility:visible;opacity:1;transition:opacity 200ms linear;-webkit-transition:opacity 200ms linear}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}.widdio .icon{height:30px;width:30px;padding:4px}.widdio .icon svg{width:100%;height:100%}.widdio .icon path{-webkit-transition:fill 300ms linear;-moz-transition:fill 300ms linear;-ms-transition:fill 300ms linear;-o-transition:fill 300ms linear;transition:fill 300ms linear;fill:#fff}.widdio .icon:hover path{fill:#d0ffea}.widdio .icon.play path.pause{display:none}.widdio .icon.pause path.play{display:none}.widdio .icon.mute path.volume-mute{display:none}.widdio .icon.muted path.volume-medium{display:none}.widdio .icon.fullscreen path.contract{display:none}.widdio .icon.center{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;padding:0}.widdio.fullscreen .icon.fullscreen path.expand{display:none}.widdio.fullscreen .icon.fullscreen path.contract{display:block}.widdio .overlay{position:absolute;left:0;top:0;width:100%;height:100%}.widdio .overlay:hover path{fill:#d0ffea}.widdio .bar{position:relative;width:1px;margin-top:10px;height:10px;background-color:#fff}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{font-weight:bold;font-size:12px;line-height:30px}'
 		//
 		,oReturn = {
 			// exposed functions
@@ -122,6 +124,7 @@ var widdio = (function(document,window,undefined) {
 			}
 		}
 	;
+	oSVGIcons;
 
 	/**
 	 * Main initialisation
@@ -184,6 +187,7 @@ var widdio = (function(document,window,undefined) {
 	 */
 	function initVariables(){
 		mBody = document.body;
+		mHead = document.head;
 		fnFullscreen = mBody.requestFullScreen||mBody.webkitRequestFullScreen||mBody.mozRequestFullScreen;//||mBody.msRequestFullScreen;
 	}
 
@@ -385,9 +389,17 @@ var widdio = (function(document,window,undefined) {
 				,sound:			toggleSound
 				,fullscreen:	toggleFullscreen
 				,isPlaying:		isPlaying
-				,getState:		function(){return sState;}
-				,toString:		function(){return '[WiddioInstance #'+sVideoID+']';}
+				,getState:		getState
+				,toString:		toString
 			}});
+		}
+
+		function getState(){
+			return sState;
+		}
+
+		function toString(){
+			return '[WiddioInstance #'+sVideoID+']';
 		}
 
 		/**
@@ -453,15 +465,15 @@ var widdio = (function(document,window,undefined) {
 			//
 			oSettings.controls.forEach(function(el){
 				if (el===oReturn.PLAYPAUSE) {
-					mCnPlayPause = createDiv('icon playpause play',mControls,undefined,undefined,togglePlay);
+					mCnPlayPause = createIcon('icon playpause play',mControls,togglePlay,['play','pause']);
 				} else if (el===oReturn.STOP) {
-					mCnStop = createDiv('icon stop',mControls,undefined,undefined,stop);
+					mCnStop = createIcon('icon stop',mControls,stop,'stop');
 				} else if (el===oReturn.VOLUME) {
-					mCnVolume = createDiv('icon volume',mControls); // todo: implement
+					mCnVolume = createIcon('icon volume',mControls,undefined,'volume-high'); // todo: implement
 				} else if (el===oReturn.MUTE) {
-					mCnMute = createDiv('icon mute',mControls,undefined,undefined,toggleSound);
+					mCnMute = createIcon('icon mute',mControls,toggleSound,['volume-mute','volume-medium']);
 				} else if (el===oReturn.FULLSCREEN) {
-					mCnFullscreen = createDiv('icon fullscreen',mControls,undefined,undefined,toggleFullscreen);
+					mCnFullscreen = createIcon('icon fullscreen',mControls,toggleFullscreen,['expand','contract']);
 				} else if (el===oReturn.SCRUB) {
 					mCnScrub = createDiv('scrub',mControls,undefined,undefined,scrub);
 					var mGutter = createDiv('gutter',mCnScrub,undefined,undefined,scrub);
@@ -471,12 +483,13 @@ var widdio = (function(document,window,undefined) {
 					mCnTime = createDiv('time',mControls);
 					showTime();
 				} else if (el===oReturn.CENTER) {
-					mCenter = createDiv('icon center play',mWrap,undefined,undefined,togglePlay);
+					mCenter = createIcon('icon center play',mWrap,togglePlay,['play','pause']);
 					if (oSettings.controls.length===1) mWiddio.removeChild(mControls); // if center is only ui element
 				}
 			});
 			//
-			createDiv('overlay',mWrap,undefined,undefined,togglePlay);
+			var mOverlay = createDiv('overlay',mWrap,undefined,undefined,togglePlay);
+			if (mCenter) mOverlay.appendChild(mCenter);
 			//
 			// fade ui when playing
 			if (oSettings.controlsFadeTime!==0) {
@@ -509,6 +522,34 @@ var widdio = (function(document,window,undefined) {
 					}
 				});
 			}
+		}
+
+		function createIcon(classes,parent,click,icon){
+			var mIcon = createDiv(classes,parent,undefined,undefined,click);
+			//if (!Array.isArray(icon)) icon = [icon];
+			//icon.forEach(addSvg.bind(undefined,mIcon));
+			addSvg(mIcon,icon);
+			return mIcon;
+		}
+
+		function addSvg(parent,name){
+			var mSvg = createElement('svg',undefined,parent,{width:32,height:32,viewBox:'0 0 32 32'});
+			if (!Array.isArray(name)) name = [name];
+			(Array.isArray(name)?name:[name]).forEach(function(icon){
+				createElement(
+					'path'
+					,icon
+					,mSvg
+					,{d:oSVGIcons[icon]}
+				);
+			});
+			/*createElement(
+				'path'
+				,null
+				,createElement('svg',name,parent,{width:32,height:32,viewBox:'0 0 32 32'})
+				,{d:oSVGIcons[name]}
+			);*/
+			parent.innerHTML = parent.innerHTML;
 		}
 
 		/**
@@ -944,7 +985,7 @@ var widdio = (function(document,window,undefined) {
 	 */
 	function extend(obj,fns,overwrite){
 		for (var s in fns) {
-			if (overwrite||obj[s]===undefined) {
+			if (fns.hasOwnProperty(s)&&(overwrite||obj[s]===undefined)) {
 				obj[s] = fns[s];
 			}
 		}
@@ -971,32 +1012,16 @@ var widdio = (function(document,window,undefined) {
 	 * Adds css directly to document.styleSheets
 	 */
 	function addCss(){
-		var oSheet
-			,bCannotAdd = false;
-		//var aValidMedia = ['screen','all','handheld'];
-		if (document.styleSheets&&document.styleSheets.length) {
-			oSheet = getSheetByMedia('all')||getSheetByMedia('screen')||document.styleSheets[0];
-		}
-		if (!oSheet) bCannotAdd = true;
-		//document.querySelector('head').appendChild(document.createElement('link'));
-		//$('<link type="text/css" rel="stylesheet" />').prependTo($('head'));
-		function addRule(selector,rule){
-			try {
-				if (oSheet.insertRule) oSheet.insertRule(selector+'{'+rule+'}', 0);
-				else oSheet.addRule(selector,rule);
-			} catch (err) { // todo: code this better
-				bCannotAdd = true;
-			}
-		}
-		if (!bCannotAdd) {
+		var oSheet = getSheetByMedia('all')||getSheetByMedia('screen');
+		if (oSheet&&(oSheet.insertRule||oSheet.addRule)) {
 			sCSS.split('}').reverse().forEach(function(subst){
-				var rla = subst.split('{')
-					,sRule = rla.shift()
-					,sRules = rla.pop();
-				addRule(sRule,sRules);
+				var aRule = subst.split('{')
+					,sRule = aRule.shift()
+					,sRules = aRule.pop();
+				sRule&&sRules&&addRule(oSheet,sRule,sRules);
 			});
 		} else {
-			createElement('style',undefined,document.querySelector('head')).innerHTML = sCSS;
+			createElement('style',undefined,mHead).innerHTML = sCSS;
 		}
 		/* jshint ignore:start */
 		// overwrite addCss method so we don't need a boolean check
@@ -1004,24 +1029,36 @@ var widdio = (function(document,window,undefined) {
 		/* jshint ignore:end */
 	}
 
+	/**
+	 * Add a rule to a stylesheet
+	 * @param {CSSStyleSheet} sheet
+	 * @param {string} selector
+	 * @param {string} rule
+	 */
+	function addRule(sheet,selector,rule){
+		if (sheet.insertRule) sheet.insertRule(selector+'{'+rule+'}', 0);
+		else sheet.addRule(selector,rule);
+	}
 
 	/**
-	 * Foo
-	 * @param type
+	 * Get a stylesheet of a specific media type
+	 * @param {string} type
 	 * @returns {CSSStyleSheet}
 	 */
 	function getSheetByMedia(type) {
 		var aDocStyle = document.styleSheets
 			,aMedia
 			,oStyleSheet;
-		loop1:
-		for (var i=0,l=aDocStyle.length;i<l;i++) {
-			oStyleSheet = aDocStyle[i];
-			aMedia = oStyleSheet.media;
-			for (var j=0,ll=aMedia.length;j<ll;j++) {
-				var sType = aMedia[j];
-				if (sType==type) {
-					break loop1;
+		if (aDocStyle) {
+			loop1:
+			for (var i=0,l=aDocStyle.length;i<l;i++) {
+				oStyleSheet = aDocStyle[i];
+				aMedia = oStyleSheet.media;
+				for (var j=0,ll=aMedia.length;j<ll;j++) {
+					var sType = aMedia[j];
+					if (sType==type) {
+						break loop1;
+					}
 				}
 			}
 		}
@@ -1042,7 +1079,13 @@ var widdio = (function(document,window,undefined) {
 	 */
 	function createElement(type,classes,parent,attributes,text,click){
 		var mElement = document.createElement(type||'div');
-		if (attributes) for (var attr in attributes) mElement.setAttribute(attr,attributes[attr]);
+		if (attributes) {
+			for (var attr in attributes) {
+				if (attributes.hasOwnProperty(attr)) {
+					mElement.setAttribute(attr,attributes[attr]);
+				}
+			}
+		}
 		if (classes) {
 			var oClassList = mElement.classList
 				,aArguments = typeof(classes)==='string'?classes.split(' '):classes;

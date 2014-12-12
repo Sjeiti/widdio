@@ -27,7 +27,12 @@ module.exports = function (grunt) {
 			}
 			,less: {
 				files: ['src/style/*.less']
-				,tasks: ['css']
+				,tasks: ['parseCSS','js']
+				,options: { spawn: false }
+			}
+			,icons: {
+				files: ['src/icons/IcoMoon - 13 Icons.zip']
+				,tasks: ['parseIcons','js']
 				,options: { spawn: false }
 			}
 			/*jsdoc: {
@@ -58,6 +63,8 @@ module.exports = function (grunt) {
 			,jsdocprepare: { cwd: './jsdoc', command: 'grunt prepare', output: true }
 		}
 
+		//########################
+
 		// update revision
 		,version_git: {
 			main: {
@@ -65,19 +72,27 @@ module.exports = function (grunt) {
 			}
 		}
 
-		// js-hint
-		,jshint: {
-			options: { jshintrc: '.jshintrc' },
-			files: aJS
-		}
-
-		,jscs: {
-			src: aJS
-			,options: {
-				config: ".jscsrc"
-				,requireCurlyBraces: [ "if" ]
+		// map source js jsdoc variables to json variables
+		,map_json: {
+			package: {
+				src: aJS[0]
+				,dest: 'package.json'
+				,map: {
+					title:'summary'
+				}
+			}
+			,jsdoc : {
+				src: aJS[0]
+				,dest: 'jsdoc.json'
+				,map: {
+					summary:'templates.systemName'
+					,copyright:'templates.copyright'
+					,author:'templates.author'
+				}
 			}
 		}
+
+		//########################
 
 		// clean
 		,clean: {
@@ -89,8 +104,63 @@ module.exports = function (grunt) {
 			}
 		}
 
+		// compile less
+		,less: {
+			options: {
+				compress: true
+			}
+			,src: {
+				src: ['src/style/main.less'],
+				dest: 'src/style/main.css'
+			}
+		}
+
+		// get icons
+		,svgIcons: {
+		  main: {
+			src: 'src/icons/IcoMoon - 13 Icons.zip'
+			,dest: 'temp/svgIcons.json'
+			//,contents:
+			// /<path.*path>/
+			,contents: /<path\sd="([^"]+)"/
+			//dest: 'src/style/svgIcons.less'
+		  }
+		}
+
+		// insert variables into js
+		,insert_vars: {
+			svgIcons: {
+				file: aJS[0]
+				,replace: {
+					'oSVGIcons': ['temp/svgIcons.json']
+				}
+			}
+			,css: {
+				file: aJS[0]
+				,toString: true
+				,replace: {
+					'sCSS': ['src/style/main.css']
+				}
+			}
+		}
+
+		// js-hint
+		,jshint: {
+			options: { jshintrc: '.jshintrc' },
+			files: aJS
+		}
+
+		// concatenate and minify
+		,uglify: {
+			dist: {
+				options: { banner: '' }
+				,src: aJS
+				,dest: 'dist/widdio.min.js'
+			}
+		}
+
 		// uses Phantomjs to render pages and inject a js file
-		,renderPages: {
+		/*,renderPages: {
 			template: {
 				baseUri: 'http://localhost.sk123ow/'
 				,dest: './temp/stripped/'
@@ -106,21 +176,15 @@ module.exports = function (grunt) {
 				,inject: 'src-dev/js/phantomRenderDocs.js'
 				,renderImage: false
 			}
-		}
+		}*/
 
-		,svgIcons: {
-		  main: {
-			src: 'src/icons/IcoMoon - 13 Icons.zip',
-			dest: 'src/style/svgIcons.less'
-		  }
-		}
-		,icomoon: {
+		/*,icomoon: {
 			updatefont: {
 				src: 'src/icons/widdio.zip'
 				,dest: 'src/style/iconfont.less'
 				,destFonts: 'src/style/fonts/'
 			}
-		}
+		}*/
 
 		/*,extendDocs: {
 			main: {
@@ -146,66 +210,52 @@ module.exports = function (grunt) {
 			}
 		}*/
 
-		// concatenate and minify
-		,uglify: {
-			dist: {
-				options: {
-				  banner: ''
-				}
-				,src: aJS
-				,dest: 'dist/widdio.min.js'
+		//########################
+		,jscs: {
+			src: aJS
+			,options: {
+				config: ".jscsrc"
+				,requireCurlyBraces: [ "if" ]
 			}
 		}
-
-		// compile less
-		,less: {
-			options: {
-				compress: true
-			}
-			,src: {
-				src: ['src/style/main.less'],
-				dest: 'src/style/main.css'
-			}
-		}
-
-		// map source js jsdoc variables to json variables
-		,map_json: {
-			package: {
-				src: aJS[0]
-				,dest: 'package.json'
-				,map: {
-					title:'summary'
-				}
-			}
-			,jsdoc : {
-				src: aJS[0]
-				,dest: 'jsdoc.json'
-				,map: {
-					summary:'templates.systemName'
-					,copyright:'templates.copyright'
-					,author:'templates.author'
-				}
-			}
-		}
+		//########################
 
 	});
 
 	grunt.registerTask('default',['watch']);
-	grunt.registerTask('css',[
-		'less'
-	]);
+
 	grunt.registerTask('js',[
 		'jshint'
 		,'uglify:dist'
 	]);
+
+	grunt.registerTask('parse',[
+		'parseIcons'
+		,'parseCSS'
+	]);
+	grunt.registerTask('parseIcons',[
+		'svgIcons'
+		,'insert_vars:svgIcons'
+	]);
+	grunt.registerTask('parseCSS',[
+		'less'
+		,'insert_vars:css'
+	]);
+
+	grunt.registerTask('dist',[
+		'parse'
+		,'js'
+	]);
+
+	//
+
 	grunt.registerTask('revision',[
 		'version_git'
 		,'map_json'
 	]);
-	grunt.registerTask('dist',[
-		'css'
-		,'js'
-	]);
+
+	//
+
 	grunt.registerTask('jsdoc',[
 		'clean:jsdoc'
 		,'cli:jsdocprepare'
