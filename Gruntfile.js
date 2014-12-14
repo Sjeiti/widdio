@@ -25,9 +25,14 @@ module.exports = function (grunt) {
 				tasks: ['js'],
 				options: { spawn: false }
 			}
-			,less: {
-				files: ['src/style/*.less']
+			,parse: {
+				files: ['src/style/widdio.less']
 				,tasks: ['parseCSS','js']
+				,options: { spawn: false }
+			}
+			,less: {
+				files: ['src/style/widdio.less']
+				,tasks: ['less']
 				,options: { spawn: false }
 			}
 			,icons: {
@@ -96,23 +101,26 @@ module.exports = function (grunt) {
 
 		// clean
 		,clean: {
-			dist: {
-				src: ['dist/**']
-			}
-			,jsdoc: {
-				src: ['doc/**']
-			}
+			dist: { src: ['dist/**'] }
+			,jsdoc: { src: ['doc/**'] }
 		}
 
 		// compile less
 		,less: {
-			options: {
-				compress: true
-			}
-			,src: {
-				src: ['src/style/main.less'],
-				dest: 'src/style/main.css'
-			}
+//			main: {
+//				options: { compress: true }
+//				,src: {
+//					src: ['src/style/main.less'],
+//					dest: 'src/style/main.css'
+//				}
+//			}
+//			,widdio: {
+				options: { compress: true }
+				,src: {
+					src: ['src/style/widdio.less'],
+					dest: 'src/style/widdio.css'
+				}
+//			}
 		}
 
 		// get icons
@@ -139,7 +147,7 @@ module.exports = function (grunt) {
 				file: aJS[0]
 				,toString: true
 				,replace: {
-					'sCSS': ['src/style/main.css']
+					'sCSS': ['src/style/widdio.css']
 				}
 			}
 		}
