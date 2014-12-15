@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.20
+ * @version 2.0.21
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -386,6 +386,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 			//
 			,oInstance = {
 				 video:			mVideo
+				,widdio:		undefined
 				,id:			sVideoID
 				,play:			play
 				,stop:			stop
@@ -486,73 +487,19 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		 */
 		function initInstView(){
 			addCss();
-			addControls();
+			initDOM();
 			resize();
 		}
 
 		/**
-		 * Handles the media event
-		 * @param {Event} e
-		 */
-		function handleMediaEvent(e) {
-			switch (e.type) {
-				case 'loadedmetadata':
-					console.log('loadedmetadata',e); // log
-					iVideoW = mVideo.videoWidth;
-					iVideoH = mVideo.videoHeight;
-					fVideoAspectRatio = iVideoW/iVideoH;
-					resize();
-					showTime();
-					break;
-				case 'canplay':
-					//console.log('canplay'); // log
-					break;
-				case 'play':
-					showPlayPause();
-					setCssState();
-					if (oWiddio.playOne) playOne(mVideo);
-					break;
-				case 'pause':
-					showPlayPause();
-					setCssState();
-					break;
-				case 'timeupdate':
-					if (mControlsBar) mControlsBar.style.width = (100*getPartPlayed())+'%';
-					showTime();
-					setCssState();
-					break;
-				case 'ended':
-					mVideo.pause();
-					setCssState();
-					break;
-				case 'volumechange':
-					showSound();
-					break;
-				case 'error':
-					var oError = e.target.error;
-					switch (oError.code) {
-						case oError.MEDIA_ERR_ABORTED: console.warn('You aborted the video playback.'); break;
-						case oError.MEDIA_ERR_NETWORK: console.warn('A network error caused the video download to fail part-way.'); break;
-						case oError.MEDIA_ERR_DECODE: console.warn('The video playback was aborted due to a corruption problem or because the video used features your browser did not support.'); break;
-						case oError.MEDIA_ERR_SRC_NOT_SUPPORTED: console.warn('The video could not be loaded, either because the server or network failed or because the format is not supported.'); break;
-						default: console.warn('An unknown error occurred.'); break;
-					}
-					break;
-			}
-			if (oSettings.stateChange) {
-				oSettings.stateChange(e,oInstance);
-			}
-		}
-
-
-		/**
 		 * Wrap the video element and add controls
 		 */
-		function addControls(){
+		function initDOM(){
 			var sVideoClass = mVideo.getAttribute('class')
 				,aVideoClass = sVideoClass?sVideoClass.split(' '):[];
 			Array.prototype.push.call(aVideoClass,'widdio',sStateStart,oSettings.size,oSettings.scaleMode);
 			mWiddio = createDiv(aVideoClass,undefined,{id:sId.toLowerCase()+'_'+sVideoID});
+			oInstance.widdio = mWiddio;
 			mWrap = createDiv('wrap',mWiddio);
 			mControls = createDiv(['controls',oSettings.controlsPosition],mWiddio);
 			mWiddio.style.width = oSettings.width+'px';
@@ -619,6 +566,61 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 						},iCenterFadeTime);
 					}
 				});
+			}
+		}
+
+
+		/**
+		 * Handles the media event
+		 * @param {Event} e
+		 */
+		function handleMediaEvent(e) {
+			switch (e.type) {
+				case 'loadedmetadata':
+					console.log('loadedmetadata',e); // log
+					iVideoW = mVideo.videoWidth;
+					iVideoH = mVideo.videoHeight;
+					fVideoAspectRatio = iVideoW/iVideoH;
+					resize();
+					showTime();
+					break;
+				case 'canplay':
+					//console.log('canplay'); // log
+					break;
+				case 'play':
+					showPlayPause();
+					setCssState();
+					if (oWiddio.playOne) playOne(mVideo);
+					break;
+				case 'pause':
+					showPlayPause();
+					setCssState();
+					break;
+				case 'timeupdate':
+					if (mControlsBar) mControlsBar.style.width = (100*getPartPlayed())+'%';
+					showTime();
+					setCssState();
+					break;
+				case 'ended':
+					mVideo.pause();
+					setCssState();
+					break;
+				case 'volumechange':
+					showSound();
+					break;
+				case 'error':
+					var oError = e.target.error;
+					switch (oError.code) {
+						case oError.MEDIA_ERR_ABORTED: console.warn('You aborted the video playback.'); break;
+						case oError.MEDIA_ERR_NETWORK: console.warn('A network error caused the video download to fail part-way.'); break;
+						case oError.MEDIA_ERR_DECODE: console.warn('The video playback was aborted due to a corruption problem or because the video used features your browser did not support.'); break;
+						case oError.MEDIA_ERR_SRC_NOT_SUPPORTED: console.warn('The video could not be loaded, either because the server or network failed or because the format is not supported.'); break;
+						default: console.warn('An unknown error occurred.'); break;
+					}
+					break;
+			}
+			if (oSettings.stateChange) {
+				oSettings.stateChange(e,oInstance);
 			}
 		}
 
