@@ -1,11 +1,15 @@
 {
 	"name": "widdio",
-	"version": "2.0.18",
+	"version": "2.0.19",
 	"main": "dist/widdio.min.js",
 	"license": "MIT",
 	"ignore": [
+		"jsdoc/",
+		"gruntTasks/",
 		"**/.*",
-		"*.md"
+		"*.md",
+		"*.js",
+		"package.json"
 	],
 	"dependencies": {},
 	"devDependencies": {},
