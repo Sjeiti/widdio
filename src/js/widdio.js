@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.19
+ * @version 2.0.20
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
