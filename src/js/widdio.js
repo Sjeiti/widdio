@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.10
+ * @version 2.0.11
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -87,9 +87,14 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		,sStatePaused = 'paused'
 		,sStateEnded = 'ended'
 		,oReturn = {
+			/**
+			 * @prop {boolean} widdio.playOne play only one video at a time
+			 */
 			playOne:			true // play only one video at a time
 			// constants
+			/** @const {string} widdio.PLAYPAUSE=playpause */
 			,PLAYPAUSE:			sUIPlaypause
+			/** @const {string} widdio.SCRUB=scrub */
 			,SCRUB:				sUIScrub
 			,STOP:				sUIStop
 			,MUTE:				sUIMute
@@ -305,13 +310,28 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	/**
 	 * Factory method for video instances
 	 * @param {HTMLVideoElement} video
-	 * @param {Object} _settings
-	 * @returns {widdio}
+	 * @param {Object} settings
+	 * @param {Object} settings.fullscreen Start in fake-fullscreen
+	 * @param {Object} settings.scaleMode How to scale
+	 * @param {Object} settings.fullscreenScaleMode How to scale in fullscreen
+	 * @param {Object} settings.size How to size the video
+	 * @param {Object} settings.width Width of Widdio
+	 * @param {Object} settings.height Height of Widdio
+	 * @param {Object} settings.fadeVolumeTime Milliseconds volume fadeout when loading a new video
+	 * @param {Object} settings.controls Determines the order and number of interface elements
+	 * @param {Object} settings.controlsPosition Position of the user interface
+	 * @param {Object} settings.controlsFadeTime Length fadeout user interface
+	 * @param {Object} settings.controlsFadeWhenPaused User interface fades out when paused
+	 * @param {Object} settings.stateChange A callback function for when the video state changes, the new state is parsed
+	 * @memberof widdio
+	 * @public
+});
+	 * @returns {widdioInstance}
 	 */
-	function instance(video,_settings) {
+	function instance(video,settings) {
 		var pause = togglePlay.bind(undefined,false)
 			//
-			,oSettings = extend(extend({},_settings),oReturn.defaults)
+			,oSettings = extend(extend({},settings),oReturn.defaults)
 			,sSettingsSize = oSettings.size
 			,bSizeFullscreen = sSettingsSize===sSizeFullscreen
 			,bSizeFixed = sSettingsSize===sSizeFixed
@@ -913,6 +933,10 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		}
 
 		// expose instance methods
+		/**
+		 * @name widdio.widdioInstance
+		 * @instance
+		 */
 		return {
 			 video:				mVideo
 			,resize:			resize

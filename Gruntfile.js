@@ -64,8 +64,12 @@ module.exports = function (grunt) {
 
 		// command line interface
 		,cli: {
-			jsdoc: { cwd: './', command: 'jsdoc -c jsdoc.json', output: true }
+			jsdoc: { cwd: './', command: '"node_modules/.bin/jsdoc" -c jsdoc.json', output: true }
+			//,jsgrudoc: { cwd: './', command: 'jsdoc -c jsdoc.json', output: true }
 			,jsdocprepare: { cwd: './jsdoc', command: 'grunt prepare', output: true }
+			//
+			,jsdocInitNpm: { cwd: './jsdoc', command: 'npm install', output: true }
+			,jsdocInitBower: { cwd: './jsdoc', command: 'bower install', output: true }
 		}
 
 		//########################

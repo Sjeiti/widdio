@@ -1,0 +1,20 @@
+{
+	"name": "widdio",
+	"version": "2.0.11",
+	"main": "dist/widdio.min.js",
+	"license": "MIT",
+	"ignore": [
+		"**/.*",
+		"*.md"
+	],
+	"dependencies": {
+	},
+	"devDependencies": {},
+	"keywords": [
+		"widdio",
+		"video",
+		"mp4",
+		"source",
+		"player"
+	]
+}
