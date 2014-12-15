@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.11
+ * @version 2.0.13
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -44,7 +44,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	var createDiv = createElement.bind(undefined,undefined)
 		//
 		,sId = 'Widdio'
-		,sVersion = '1.1.5'
+		,sVersion = '2.0.13'
 		,sCopyright = 'Copyright (c) 2010-2015 Ron Valstar'
 		//
 		,mBody
@@ -988,7 +988,6 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	 * Adds css directly to document.styleSheets
 	 */
 	function addCss(){
-		if ('asdf'===false) {
 		var oSheet = getSheetByMedia('all')||getSheetByMedia('screen');
 		if (oSheet&&(oSheet.insertRule||oSheet.addRule)) {
 			sCSS.split('}').reverse().forEach(function(subst){
@@ -1004,7 +1003,6 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		// overwrite addCss method so we don't need a boolean check
 		addCss = function(){};
 		/* jshint ignore:end */
-		}
 	}
 
 	/**

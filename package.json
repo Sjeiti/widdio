@@ -1,6 +1,6 @@
 {
   "name": "widdio",
-  "version": "2.0.11",
+  "version": "2.0.13",
   "description": "A simple HTML5 video player",
   "devDependencies": {
     "load-grunt-tasks": "~0.4.0",
