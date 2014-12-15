@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.17
+ * @version 2.0.18
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -86,7 +86,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		,sStatePlaying = 'playing'
 		,sStatePaused = 'paused'
 		,sStateEnded = 'ended'
-		,oReturn = {
+		,oWiddio = {
 			/**
 			 * @prop {boolean} widdio.playOne play only one video at a time
 			 */
@@ -225,14 +225,17 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	 *
 	 * @param {NodeList|HTMLVideoElement} video
 	 * @param {object} options
-	 * @returns List of video objects
+	 * @returns {object[]|object} List of video objects
 	 */
 	function initVideo(video,options){
-		if (video.constructor===HTMLVideoElement) video = [video];
+		var isVideoElement = video.constructor===HTMLVideoElement
+			,oWiddioInstance;
+		if (isVideoElement) video = [video];
 		for (var i=0,l=video.length;i<l;i++) {
-			aWiddioObj.push(instance(video[i],options));
+			oWiddioInstance = instance(video[i],options);
+			aWiddioObj.push(oWiddioInstance);
 		}
-		return aWiddioObj;
+		return isVideoElement?oWiddioInstance:aWiddioObj;
 	}
 
 	/**
@@ -241,11 +244,10 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	 */
 	function handleFullscreenChange(e){
 		var mTarget = e.target
-			,oWiddio = getWiddio(mTarget)
+			,oWiddioInstance = getWiddio(mTarget)
 			,bFullscreen = isFullscreen()
 		;
-		bFullscreen;
-		if (oWiddio) {
+		if (oWiddioInstance) {
 			if (bFullscreen) {
 				mTarget.classList.add(sSizeFullscreen);
 			} else {
@@ -333,7 +335,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	function instance(video,settings) {
 		var pause = togglePlay.bind(undefined,false)
 			//
-			,oSettings = extend(extend({},settings),oReturn.defaults)
+			,oSettings = extend(extend({},settings),oWiddio.defaults)
 			,sSettingsSize = oSettings.size
 			,bSizeFullscreen = sSettingsSize===sSizeFullscreen
 			,bSizeFixed = sSettingsSize===sSizeFixed
@@ -381,6 +383,21 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 			,iControlsHeight
 			//
 			,sState = sStateStart
+			//
+			,oInstance = {
+				 video:			mVideo
+				,id:			sVideoID
+				,play:			play
+				,stop:			stop
+				,toggle:		togglePlay.bind(undefined,undefined)//function(){togglePlay();}
+				,pause:			pause
+				,sound:			toggleSound
+				,fullscreen:	toggleFullscreen
+				,resize:		resize
+				,isPlaying:		isPlaying
+				,getState:		getState
+				,toString:		function(){ return '['+[sId,sVersion,sCopyright].join(' ')+' #'+sVideoID+']'; }
+			}
 		;
 
 		(function init() {
@@ -427,32 +444,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		 * Initialise instance external API
 		 */
 		function  initInstAPI(){
-			extend(mVideo,{widdio:{
-				 video:			mVideo
-				,play: function(file) {
-					if (file===undefined) {
-						togglePlay(true);
-					} else {
-						playVideo(file);
-					}
-				}
-				,stop:			stop
-				,toggle:		togglePlay.bind(undefined,undefined)//function(){togglePlay();}
-				,pause:			pause
-				,sound:			toggleSound
-				,fullscreen:	toggleFullscreen
-				,isPlaying:		isPlaying
-				,getState:		getState
-				,toString:		toString
-			}});
-		}
-
-		function getState(){
-			return sState;
-		}
-
-		function toString(){
-			return '['+[sId,sVersion,sCopyright].join(' ')+' #'+sVideoID+']';
+			extend(mVideo,{widdio:oInstance});
 		}
 
 		/**
@@ -483,8 +475,8 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 				//,'ratechange'		// Either the defaultPlaybackRate or the playbackRate attribute has just been updated.
 				,'volumechange'		// Either the volume attribute or the muted attribute has changed. Fired after the relevant attribute's setter has returned.
 			].forEach(function(event){
-				mVideo.addEventListener(event,handleMediaEvent);
-			});
+					mVideo.addEventListener(event,handleMediaEvent);
+				});
 			//
 			mVideo.addEventListener('click',togglePlay);
 		}
@@ -497,6 +489,61 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 			addControls();
 			resize();
 		}
+
+		/**
+		 * Handles the media event
+		 * @param {Event} e
+		 */
+		function handleMediaEvent(e) {
+			switch (e.type) {
+				case 'loadedmetadata':
+					console.log('loadedmetadata',e); // log
+					iVideoW = mVideo.videoWidth;
+					iVideoH = mVideo.videoHeight;
+					fVideoAspectRatio = iVideoW/iVideoH;
+					resize();
+					showTime();
+					break;
+				case 'canplay':
+					//console.log('canplay'); // log
+					break;
+				case 'play':
+					showPlayPause();
+					setCssState();
+					if (oWiddio.playOne) playOne(mVideo);
+					break;
+				case 'pause':
+					showPlayPause();
+					setCssState();
+					break;
+				case 'timeupdate':
+					if (mControlsBar) mControlsBar.style.width = (100*getPartPlayed())+'%';
+					showTime();
+					setCssState();
+					break;
+				case 'ended':
+					mVideo.pause();
+					setCssState();
+					break;
+				case 'volumechange':
+					showSound();
+					break;
+				case 'error':
+					var oError = e.target.error;
+					switch (oError.code) {
+						case oError.MEDIA_ERR_ABORTED: console.warn('You aborted the video playback.'); break;
+						case oError.MEDIA_ERR_NETWORK: console.warn('A network error caused the video download to fail part-way.'); break;
+						case oError.MEDIA_ERR_DECODE: console.warn('The video playback was aborted due to a corruption problem or because the video used features your browser did not support.'); break;
+						case oError.MEDIA_ERR_SRC_NOT_SUPPORTED: console.warn('The video could not be loaded, either because the server or network failed or because the format is not supported.'); break;
+						default: console.warn('An unknown error occurred.'); break;
+					}
+					break;
+			}
+			if (oSettings.stateChange) {
+				oSettings.stateChange(e,oInstance);
+			}
+		}
+
 
 		/**
 		 * Wrap the video element and add controls
@@ -676,6 +723,10 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 			}*/
 		}
 
+		function getState(){
+			return sState;
+		}
+
 		/**
 		 * Toggle instance fullscreen
 		 */
@@ -765,6 +816,17 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		}
 
 		/**
+		 * Starts the video playback
+		 */
+		function play(file) {
+			if (file===undefined) {
+				togglePlay(true);
+			} else {
+				playVideo(file);
+			}
+		}
+
+		/**
 		 * Stops the video playback
 		 */
 		function stop() {
@@ -843,59 +905,6 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		}
 
 		/**
-		 * Handles the media event
-		 * @param {Event} e
-		 */
-		function handleMediaEvent(e) {
-			switch (e.type) {
-				case 'loadedmetadata':
-					console.log('loadedmetadata',e); // log
-					iVideoW = mVideo.videoWidth;
-					iVideoH = mVideo.videoHeight;
-					fVideoAspectRatio = iVideoW/iVideoH;
-					resize();
-					showTime();
-				break;
-				case 'canplay':
-					//console.log('canplay'); // log
-				break;
-				case 'play':
-					showPlayPause();
-					setCssState();
-					if (oReturn.playOne) playOne(mVideo);
-				break;
-				case 'pause':
-					showPlayPause();
-					setCssState();
-				break;
-				case 'timeupdate':
-					if (mControlsBar) mControlsBar.style.width = (100*getPartPlayed())+'%';
-					showTime();
-					setCssState();
-				break;
-				case 'ended':
-					mVideo.pause();
-					setCssState();
-				break;
-				case 'volumechange':
-					showSound();
-				break;
-				case 'error':
-					switch (e.target.error.code) {
-						case e.target.error.MEDIA_ERR_ABORTED: console.warn('You aborted the video playback.'); break;
-						case e.target.error.MEDIA_ERR_NETWORK: console.warn('A network error caused the video download to fail part-way.'); break;
-						case e.target.error.MEDIA_ERR_DECODE: console.warn('The video playback was aborted due to a corruption problem or because the video used features your browser did not support.'); break;
-						case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED: console.warn('The video could not be loaded, either because the server or network failed or because the format is not supported.'); break;
-						default: console.warn('An unknown error occurred.'); break;
-					}
-				break;
-			}
-			if (oSettings.stateChange) {
-				oSettings.stateChange(sState,mWiddio);
-			}
-		}
-
-		/**
 		 * Sets the CSS state
 		 */
 		function setCssState() {
@@ -941,12 +950,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		 * @name widdio.widdioInstance
 		 * @instance
 		 */
-		return {
-			 video:				mVideo
-			,resize:			resize
-			,pause:				pause
-			,id:				sVideoID
-		};
+		return oInstance;
 	}
 	//################################################################################################################
 	//###############################################################################################################
@@ -1077,5 +1081,5 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		return mElement;
 	}
 
-	return extend(initVideo,oReturn);
+	return extend(initVideo,oWiddio);
 })(document,window);
