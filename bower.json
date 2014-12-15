@@ -1,6 +1,6 @@
 {
 	"name": "widdio",
-	"version": "2.0.13",
+	"version": "2.0.14",
 	"main": "dist/widdio.min.js",
 	"license": "MIT",
 	"ignore": [

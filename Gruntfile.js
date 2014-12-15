@@ -99,6 +99,13 @@ module.exports = function (grunt) {
 					,author:'templates.author'
 				}
 			}
+			,bower: {
+				src: aJS[0]
+				,dest: 'bower.json'
+				,map: {
+					license:'foo'
+				}
+			}
 		}
 
 		//########################
