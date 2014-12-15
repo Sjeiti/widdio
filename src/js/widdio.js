@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.16
+ * @version 2.0.17
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -225,12 +225,14 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	 *
 	 * @param {NodeList|HTMLVideoElement} video
 	 * @param {object} options
+	 * @returns List of video objects
 	 */
 	function initVideo(video,options){
 		if (video.constructor===HTMLVideoElement) video = [video];
 		for (var i=0,l=video.length;i<l;i++) {
 			aWiddioObj.push(instance(video[i],options));
 		}
+		return aWiddioObj;
 	}
 
 	/**
