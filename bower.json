@@ -7,8 +7,7 @@
 		"**/.*",
 		"*.md"
 	],
-	"dependencies": {
-	},
+	"dependencies": {},
 	"devDependencies": {},
 	"keywords": [
 		"widdio",
