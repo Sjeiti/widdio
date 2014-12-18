@@ -54,6 +54,8 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		,iScreenH
 		,fScreenAspectRatio
 		//
+		,fn = function(){}
+		//
 		,aWiddioObj = []
 		//
 		,fnFullscreen
@@ -200,8 +202,8 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	function initVariables(){
 		mBody = document.body;
 		mHead = document.head;
-		fnFullscreen = mBody.requestFullScreen||mBody.webkitRequestFullScreen||mBody.mozRequestFullScreen;//||mBody.msRequestFullScreen;
-		fnFullscreenExit = (document.exitFullScreen||document.webkitCancelFullScreen||document.mozCancelFullScreen).bind(document);//||mBody.msRequestFullScreen;
+		fnFullscreen = mBody.requestFullScreen||mBody.webkitRequestFullScreen||mBody.mozRequestFullScreen||fn;//||mBody.msRequestFullScreen;
+		fnFullscreenExit = (document.exitFullScreen||document.webkitCancelFullScreen||document.mozCancelFullScreen||fn).bind(document);//||mBody.msRequestFullScreen;
 	}
 
 	/**
@@ -695,7 +697,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		 * Toggle instance fullscreen
 		 */
 		function toggleFullscreen(){
-			if (fnFullscreen) {
+			if (fnFullscreen!==fn) {
 				if (isFullscreen()) {
 					fnFullscreenExit();
 				} else {
