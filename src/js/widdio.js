@@ -359,7 +359,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 			//
 			,iWiddioW
 			,iWiddioH // excluding controls bar
-			,fWiddioAspectRatio
+			,fWiddioAspectRatio = 16/9
 			//
 			,mVideo = video
 			,mParent = mVideo.parentNode
