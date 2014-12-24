@@ -255,6 +255,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 				mTarget.classList.add(sSizeFullscreen);
 			} else {
 				mTarget.classList.remove(sSizeFullscreen);
+				oWiddioInstance.resize();
 			}
 		}
 	}
