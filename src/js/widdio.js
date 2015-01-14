@@ -2,7 +2,7 @@
  * A simple HTML5 video player
  * @summary A simple HTML5 video player
  * @namespace widdio
- * @version 2.0.26
+ * @version 2.0.30
  * @license http://www.opensource.org/licenses/mit-license.php, http://www.gnu.org/licenses/gpl.html
  * @author Ron Valstar (http://ronvalstar.nl/)
  * @copyright (c) 2014 Ron Valstar
@@ -44,7 +44,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	var createDiv = createElement.bind(undefined,undefined)
 		//
 		,sId = 'Widdio'
-		,sVersion = '2.0.16'
+		,sVersion = '2.0.30'
 		,sCopyright = 'Copyright (c) 2010-2015 Ron Valstar'
 		//
 		,mBody
@@ -63,7 +63,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		,mFullscreenLast
 		//
 		,oSVGIcons = {"contract":"M2 18h12v12l-4.321-4.321-6.313 6.313-3.359-3.359 6.313-6.313zM25.679 22.321l6.313 6.313-3.359 3.359-6.313-6.313-4.321 4.321v-12h12zM30 14h-12v-12l4.321 4.321 6.313-6.313 3.359 3.359-6.313 6.313zM9.679 6.321l4.321-4.321v12h-12l4.321-4.321-6.313-6.313 3.359-3.359z","expand":"M32 0v12l-4.321-4.321-6.625 6.625-3.359-3.359 6.625-6.625-4.321-4.321zM7.679 4.321l6.625 6.625-3.359 3.359-6.625-6.625-4.321 4.321v-12h12zM27.679 24.321l4.321-4.321v12h-12l4.321-4.321-6.625-6.625 3.359-3.359zM14.304 21.054l-6.625 6.625 4.321 4.321h-12v-12l4.321 4.321 6.625-6.625z","pause":"M4 4h10v24h-10zM18 4h10v24h-10z","play":"M6 4l20 12-20 12z","stop":"M4 4h24v24h-24z","volume-high":"M27.814 28.814c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.739-2.739 4.247-6.38 4.247-10.253s-1.508-7.514-4.247-10.253c-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c3.305 3.305 5.126 7.7 5.126 12.374s-1.82 9.069-5.126 12.374c-0.293 0.293-0.677 0.439-1.061 0.439zM22.485 25.985c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 4.094-4.094 4.094-10.755 0-14.849-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546c-0.293 0.293-0.677 0.439-1.061 0.439zM17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-medium":"M22.485 25.985c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 4.094-4.094 4.094-10.755 0-14.849-0.586-0.586-0.586-1.536 0-2.121s1.536-0.586 2.121 0c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546c-0.293 0.293-0.677 0.439-1.061 0.439zM17.157 23.157c-0.384 0-0.768-0.146-1.061-0.439-0.586-0.586-0.586-1.535 0-2.121 2.534-2.534 2.534-6.658 0-9.192-0.586-0.586-0.586-1.536 0-2.121s1.535-0.586 2.121 0c3.704 3.704 3.704 9.731 0 13.435-0.293 0.293-0.677 0.439-1.061 0.439zM12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z","volume-mute":"M12.542 2.458c0.802-0.802 1.458-0.53 1.458 0.604v25.875c0 1.134-0.656 1.406-1.458 0.604l-7.542-7.542h-5v-12h5l7.542-7.542z"}
-		,sCSS = '.widdio{position:relative;color:#fff;background-color:#333;overflow:hidden;max-width:100%;max-height:100%;line-height:100%;box-sizing:border-box}.widdio.original,.widdio.fixed{max-width:none;max-height:none}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%!important;height:100%!important;z-index:2147483647}.widdio *,.widdio *:before,.widdio *:after{box-sizing:inherit}.widdio .wrap{position:relative;width:100%;height:100%}.widdio video{max-height:100%;width:auto;height:100%;position:absolute;left:50%;top:49.9%;-webkit-transform:translateX(-50%) translateY(-50%);-moz-transform:translateX(-50%) translateY(-50%);-ms-transform:translateX(-50%) translateY(-50%);-o-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%)}.widdio video .vertical{max-width:100%;max-heigth:none}.widdio.nobars video{min-width:100%;min-height:100%;width:auto;height:auto}.widdio.bars video{max-height:none;width:100%;max-width:100%;height:auto}.widdio.bars.barsflipped video{max-height:100%;width:auto;max-width:none;height:100%}.widdio.controls-under{padding-bottom:30px}.widdio .controls{position:absolute;left:0;bottom:0;width:100%;height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4);display:table}.widdio .controls>*{position:relative;height:100%;padding:0;overflow:hidden;display:table-cell;vertical-align:middle;cursor:pointer;text-align:center}.widdio .icon{height:30px;width:30px;padding:4px}.widdio .icon svg{width:100%;height:100%}.widdio .icon path{-webkit-transition:fill 300ms linear;-moz-transition:fill 300ms linear;-ms-transition:fill 300ms linear;-o-transition:fill 300ms linear;transition:fill 300ms linear;fill:#fff}.widdio .icon:hover path{fill:#d0ffea}.widdio .icon.play path.pause{display:none}.widdio .icon.pause path.play{display:none}.widdio .icon.mute path.volume-mute{display:none}.widdio .icon.muted path.volume-medium{display:none}.widdio .icon.fullscreen path.contract{display:none}.widdio .icon.center{position:absolute;left:50%;top:50%;width:70px;height:70px;-webkit-transform:translateX(-50%) translateY(-50%);-moz-transform:translateX(-50%) translateY(-50%);-ms-transform:translateX(-50%) translateY(-50%);-o-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%);padding:0}.widdio .gutter{position:relative}.widdio .buffer{position:absolute;left:0;top:0;height:10px;background-color:rgba(255,255,255,0.2)}.widdio .bar{position:relative;width:1px;height:10px;background-color:#fff}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{width:90px;font-weight:bold;font-size:12px}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}'
+		,sCSS = '.widdio{position:relative;color:#fff;background-color:#333;overflow:hidden;max-width:100%;max-height:100%;line-height:100%;box-sizing:border-box}.widdio.original,.widdio.fixed{max-width:none;max-height:none}.widdio.fullscreen{position:fixed;left:0;top:0;width:100%!important;height:100%!important;z-index:2147483647}.widdio *,.widdio *:before,.widdio *:after{box-sizing:inherit}.widdio .wrap{position:relative;width:100%;height:100%}.widdio video{display:block;max-height:100%;width:auto;height:100%;position:absolute;left:50%;top:49.9%;-webkit-transform:translateX(-50%) translateY(-50%);-moz-transform:translateX(-50%) translateY(-50%);-ms-transform:translateX(-50%) translateY(-50%);-o-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%)}.widdio video .vertical{max-width:100%;max-heigth:none}.widdio.nobars video{min-width:100%;min-height:100%;width:auto;height:auto}.widdio.bars video{max-height:none;width:100%;max-width:100%;height:auto}.widdio.bars.barsflipped video{max-height:100%;width:auto;max-width:none;height:100%}.widdio.controls-under{padding-bottom:30px}.widdio .controls{position:absolute;left:0;bottom:0;width:100%;height:30px;overflow:hidden;background-color:rgba(0,0,0,0.4);display:table}.widdio .controls>*{position:relative;height:100%;padding:0;overflow:hidden;display:table-cell;vertical-align:middle;cursor:pointer;text-align:center}.widdio .icon{height:30px;width:30px;padding:4px}.widdio .icon svg{width:100%;height:100%}.widdio .icon path{-webkit-transition:fill 300ms linear;-moz-transition:fill 300ms linear;-ms-transition:fill 300ms linear;-o-transition:fill 300ms linear;transition:fill 300ms linear;fill:#fff}.widdio .icon:hover path{fill:#d0ffea}.widdio .icon.play path.pause{display:none}.widdio .icon.pause path.play{display:none}.widdio .icon.mute path.volume-mute{display:none}.widdio .icon.muted path.volume-medium{display:none}.widdio .icon.fullscreen path.contract{display:none}.widdio .icon.center{position:absolute;left:50%;top:50%;width:70px;height:70px;-webkit-transform:translateX(-50%) translateY(-50%);-moz-transform:translateX(-50%) translateY(-50%);-ms-transform:translateX(-50%) translateY(-50%);-o-transform:translateX(-50%) translateY(-50%);transform:translateX(-50%) translateY(-50%);padding:0}.widdio .gutter{position:relative}.widdio .buffer{position:absolute;left:0;top:0;height:10px;background-color:rgba(255,255,255,0.2)}.widdio .bar{position:relative;width:1px;height:10px;background-color:#fff}.widdio .bar>*{position:absolute;left:0;top:0}.widdio .time{width:90px;font-weight:bold;font-size:12px}.widdio .fadeOut{visibility:hidden;opacity:0;transition:visibility 0s 1000ms, opacity 1000ms linear;-webkit-transition:visibility 0s 1000ms, opacity 1000ms linear}'
 		//
 		,sClassnameHide = 'fadeOut'
 		,sClassnameBarsFlipped = 'barsflipped'
@@ -356,7 +356,8 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 			//
 			,iVideoW
 			,iVideoH
-			,fVideoAspectRatio
+			,fVideoAspectRatio = 16/9
+			,bLoadedMetaData = false
 			//
 			,iWiddioW
 			,iWiddioH // excluding controls bar
@@ -430,6 +431,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 //			console.log('oSettings',oSettings); // log
 			iVideoW = mVideo.offsetWidth;
 			iVideoH = mVideo.offsetHeight;
+			//
 			if (oSettings.width===null)	oSettings.width =  !!iVidAtrW?parseInt(iVidAtrW):iVideoW;
 			if (oSettings.height===null)oSettings.height = !!iVidAtrH?parseInt(iVidAtrH):iVideoH;
 			//
@@ -589,6 +591,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 					iVideoW = mVideo.videoWidth;
 					iVideoH = mVideo.videoHeight;
 					fVideoAspectRatio = iVideoW/iVideoH;
+					bLoadedMetaData = true;
 					resize();
 					showTime();
 					break;
@@ -618,12 +621,14 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 					break;
 				case 'error':
 					var oError = e.target.error;
-					switch (oError.code) {
-						case oError.MEDIA_ERR_ABORTED: console.warn('You aborted the video playback.'); break;
-						case oError.MEDIA_ERR_NETWORK: console.warn('A network error caused the video download to fail part-way.'); break;
-						case oError.MEDIA_ERR_DECODE: console.warn('The video playback was aborted due to a corruption problem or because the video used features your browser did not support.'); break;
-						case oError.MEDIA_ERR_SRC_NOT_SUPPORTED: console.warn('The video could not be loaded, either because the server or network failed or because the format is not supported.'); break;
-						default: console.warn('An unknown error occurred.'); break;
+					if (oError&&oError.code) {
+						switch (oError.code) {
+							case oError.MEDIA_ERR_ABORTED: console.warn('You aborted the video playback.'); break;
+							case oError.MEDIA_ERR_NETWORK: console.warn('A network error caused the video download to fail part-way.'); break;
+							case oError.MEDIA_ERR_DECODE: console.warn('The video playback was aborted due to a corruption problem or because the video used features your browser did not support.'); break;
+							case oError.MEDIA_ERR_SRC_NOT_SUPPORTED: console.warn('The video could not be loaded, either because the server or network failed or because the format is not supported.'); break;
+							default: console.warn('An unknown error occurred.'); break;
+						}
 					}
 					break;
 			}
@@ -656,37 +661,63 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 		/**
 		 * Resize the widdio instance
 		 */
+		var iResizeTimeout,bImgLoad = false;
 		function resize() {
-			mWiddio.removeAttribute('style');
-			if (bSizeFullscreen) {
-				iWiddioW = iScreenW;
-				iWiddioH = iScreenH;
-			} else if (bSizeFixed) {
-				iWiddioW = oSettings.width;
-				iWiddioH = oSettings.height;
-			} else if (bSizeOriginal) {
-				iWiddioW = iVideoW;
-				iWiddioH = iVideoH;
-			} else if (bSizeDynamic) {
-				iWiddioW = mWiddio.offsetWidth;
-				iWiddioH = mWiddio.offsetHeight;
+			mWiddio.style.width = '100%';
+
+
+			// clean this shit
+			// when preload="none" (usefull for multiple videos) no metadata is loaded yet, fake it by preloading poster
+			if (!bLoadedMetaData&&!bImgLoad) {
+				bImgLoad = true;
+				var mImg = document.createElement('img');
+				mImg.setAttribute('src',mVideo.getAttribute('poster'));
+				mImg.addEventListener('load',function(){
+					if (!bLoadedMetaData) {
+						fVideoAspectRatio = mImg.naturalWidth/mImg.naturalHeight;
+						resize();
+					}
+				});
 			}
 
-			if (bScaleModeAspectRatio) {
-				iWiddioH = (iWiddioW/fVideoAspectRatio)<<0;
-			}
-			fWiddioAspectRatio = iWiddioW/iWiddioH;
+			// maybe only for bSizeDynamic or bSizeFullscreen???
+			clearTimeout(iResizeTimeout);
+			iResizeTimeout=setTimeout(function(){///////////////////////////////////////////////
 
-			mWiddio.style.width = iWiddioW+'px';
-			mWiddio.style.height = iWiddioH+'px';
+				mWiddio.removeAttribute('style');
 
-			if (bSizeFixed&&bScaleModeBars) {
-				if (fWiddioAspectRatio>fVideoAspectRatio) {
-					mWiddio.classList.add(sClassnameBarsFlipped);
-				} else {
-					mWiddio.classList.remove(sClassnameBarsFlipped);
+				if (bSizeFullscreen) {
+					iWiddioW = iScreenW;
+					iWiddioH = iScreenH;
+				} else if (bSizeFixed) {
+					iWiddioW = oSettings.width;
+					iWiddioH = oSettings.height;
+				} else if (bSizeOriginal) {
+					iWiddioW = iVideoW;
+					iWiddioH = iVideoH;
+				} else if (bSizeDynamic) {
+					//iWiddioW = mWiddio.parentNode.offsetWidth||mWiddio.offsetWidth;
+					iWiddioW = mWiddio.offsetWidth;
+					iWiddioH = mWiddio.offsetHeight;
 				}
-			}
+
+				if (bScaleModeAspectRatio) {
+					iWiddioH = (iWiddioW/fVideoAspectRatio)<<0;
+				}
+				fWiddioAspectRatio = iWiddioW/iWiddioH;
+
+				mWiddio.style.width = (iWiddioW).toString()+'px';
+				mWiddio.style.height = (iWiddioH).toString()+'px'; // toString because ios doesn't cast properly
+
+				if (bSizeFixed&&bScaleModeBars) {
+					if (fWiddioAspectRatio>fVideoAspectRatio) {
+						mWiddio.classList.add(sClassnameBarsFlipped);
+					} else {
+						mWiddio.classList.remove(sClassnameBarsFlipped);
+					}
+				}
+
+			},40);////////////////////////////////////////////////
 		}
 
 		function getState(){
@@ -988,7 +1019,7 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 	 */
 	function addCss(){
 		var oSheet = getSheetByMedia('all')||getSheetByMedia('screen');
-		if (oSheet&&(oSheet.insertRule||oSheet.addRule)) {
+		if (false&&oSheet&&(oSheet.insertRule||oSheet.addRule)) {
 			sCSS.split('}').reverse().forEach(function(subst){
 				var aRule = subst.split('{')
 					,sRule = aRule.shift()
@@ -996,7 +1027,10 @@ if (window.widdio===undefined) window.widdio = (function(document,window,undefin
 				sRule&&sRules&&addRule(oSheet,sRule,sRules);
 			});
 		} else {
-			createElement('style',undefined,mHead).innerHTML = sCSS;
+			var mStyle = createElement('style');
+			mStyle.innerHTML = sCSS;
+			if (mHead.children.length) mHead.insertBefore(mStyle,mHead.children[0]);
+			else  mHead.appendChild(mStyle);
 		}
 		/* jshint ignore:start */
 		// overwrite addCss method so we don't need a boolean check

@@ -40,13 +40,10 @@
 		.size(100%);
 	}
 		video {
-	//		min-width: 100%;
-	//		min-height: 100%;
-	//		max-width:100%;
+			display: block;
 			max-height:100%;
 			width: auto;
 			height: 100%;
-//			.size(100%);
 			.lt(50%,49.9%); // because rounding
 			.transform(translateX(-50%) translateY(-50%));
 			.vertical {
@@ -83,7 +80,6 @@
 		height: @controlHeight;
 		overflow: hidden;
 		background-color: @colorControlBg;
-//		.flex;
 		display: table;
 		>*{
 			position: relative;
@@ -92,8 +88,6 @@
 			overflow: hidden;
 			display: table-cell;
 			vertical-align: middle;
-//			display: block;
-//			float: left;
 			cursor: pointer;
 			text-align: center;
 		}
@@ -163,139 +157,3 @@
 		-webkit-transition: visibility 0s 1000ms, opacity 1000ms linear;
 	}
 }
-
-
-/*
-.wasdfiddio {
-	position: relative;
-	z-index: auto;
-	color: white;
-
-	&.fullscreen {
-		position:fixed;
-		left:0;
-		top:0;
-		width:100%;
-		height:100%;
-		z-index: @maxZ;
-	}
-	&.nobars .staticwrap {
-		width:100%;
-		height:100%;
-		overflow:hidden;
-	}
-	&.fullscreen video {
-		width:100%;
-		height:100%;
-	}
-
-	.staticwrap {
-		height:100%;
-	}
-		video {
-			display: block;
-			margin-left: 50%;
-			.transform(translateX(-50%));
-		}
-
-	.controls {
-		height: 30px;
-		overflow: hidden;
-		background-color: @colorControlBg;
-		&.over {
-			position: absolute;
-			bottom: 0;
-		}
-		>*{
-			position: relative;
-			height: 100%;
-			overflow: hidden;
-			display: block;
-			float: left;
-			cursor: pointer;
-			text-align: center;
-		}
-	}
-	&.fullscreen .controls {
-		position:fixed;
-		bottom:0;
-	}
-
-	.icon.center.play, .controls {
-		visibility: visible;
-		opacity: 1;
-		transition: opacity 200ms linear;
-		-webkit-transition: opacity 200ms linear;
-	}
-	.fadeOut {
-		visibility: hidden;
-		opacity: 0;
-		transition: visibility 0s 1000ms, opacity 1000ms linear;
-		-webkit-transition: visibility 0s 1000ms, opacity 1000ms linear;
-	}
-
-	.icon {
-		height: 30px;
-		width: 30px;
-		padding: 4px;
-
-		svg {
-			width: 100%;
-			height: 100%;
-		}
-		path {
-			.transition(fill 300ms linear);
-			fill: @colorIcon;
-		}
-		&:hover path { fill: @colorIconHover; }
-
-		&.play path.pause { display:none; }
-		&.pause path.play { display:none; }
-
-		&.mute path.volume-mute { display:none; }
-		&.muted path.volume-medium { display:none; }
-
-		&.fullscreen path.contract { display:none; }
-
-		&.center {
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			width: 50px;
-			height: 50px;
-			margin: -25px 0 0 -25px;
-			padding: 0;
-		}
-	}
-	&.fullscreen .icon.fullscreen {
-		path.expand { display:none; }
-		path.contract { display:block; }
-	}
-
-	.overlay {
-		position: absolute;
-		left: 0;
-		top: 0;
-		width: 100%;
-		height: 100%;
-		&:hover path { fill: @colorIconHover; }
-	}
-
-	.bar {
-		position: relative;
-		width: 1px;
-		margin-top: 10px;
-		height: 10px;
-		background-color: @colorIcon;
-		> * {
-			position: absolute;
-			left: 0;
-			top: 0;
-		}
-	}
-	.time {
-		font-weight: bold;
-		font-size: 12px;
-		line-height: 30px;
-	}
-}*/
